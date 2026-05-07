@@ -1,0 +1,20 @@
+server:
+  port: 8044 # (Localhost:8044'ten bağlanacak)
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update # Tabloları otomatik oluşturur/günceller
+    show-sql: true # Konsolda SQL sorgularını görmek için
+  
+  servlet:
+    multipart:
+      max-file-size: 10MB # Yüklenecek maksimum dosya boyutu
+      max-request-size: 10MB
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/akilli_operasyon_db 
+    username: postgres
+    password: 1234 
+    driver-class-name: org.postgresql.Driver
