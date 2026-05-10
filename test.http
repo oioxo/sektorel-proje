@@ -1,0 +1,25 @@
+### Parametre Ekleme Testi (Sıcaklık)
+POST http://localhost:8044/parametre/ekle
+Content-Type: application/json
+
+{
+  "parametreAdi": "Sıcaklık"
+}
+
+### Depo Ekleme Testi
+# Not: isyeriId kısmına veritabanındaki gerçek bir işyeri ID'sini yazmalısın.
+POST http://localhost:8044/depo/ekle
+Content-Type: application/json
+
+{
+  "depoKodu": "TMO-ANK-01",
+  "depoAciklama": "Ankara Merkez Silo - 1",
+  "isyeriId": 1 
+}
+### İşyeri Ekleme Testi
+POST http://localhost:8044/isyeri/save
+Content-Type: application/json
+
+{
+  "isyeriAdi": "TMO Ankara Başmüdürlüğü"
+}
