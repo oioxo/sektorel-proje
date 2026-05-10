@@ -23,3 +23,36 @@ Content-Type: application/json
 {
   "isyeriAdi": "TMO Ankara Başmüdürlüğü"
 }
+### Ürün-Parametre Referans Ekleme Testi
+# Not: Sistemimizde şu an id:1 olan bir Buğday ve id:1 olan Sıcaklık parametresi var.
+# Buğdayın sıcaklığı 15 ile 25 derece arasında olmalı diyoruz.
+POST http://localhost:8044/urun/referans-ekle
+Content-Type: application/json
+
+{
+  "urunId": 1,
+  "parametreId": 1,
+  "minDeger": 15.0,
+  "maxDeger": 25.0
+}
+### TEST 1: Normal Ölçüm (20 Derece - Uyarı Vermemeli)
+POST http://localhost:8044/olcum/kaydet
+Content-Type: application/json
+
+{
+  "depoId": 1,
+  "parametreId": 1,
+  "urunId": 1,
+  "olcumDegeri": 20.0
+}
+
+### TEST 2: Tehlikeli Ölçüm (30 Derece - Uyarı Vermeli!)
+POST http://localhost:8044/olcum/kaydet
+Content-Type: application/json
+
+{
+  "depoId": 1,
+  "parametreId": 1,
+  "urunId": 1,
+  "olcumDegeri": 30.0
+}

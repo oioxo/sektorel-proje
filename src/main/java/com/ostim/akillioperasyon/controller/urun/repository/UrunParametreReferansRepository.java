@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UrunParametreReferansRepository extends JpaRepository<UrunParametreReferansEntity, Long> {
+public interface UrunParametreReferansRepository extends JpaRepository<UrunParametreReferansEntity, Long> {UrunParametreReferansEntity findByUrun_IdAndParametre_Id(Long urunId, Long parametreId);
 }
