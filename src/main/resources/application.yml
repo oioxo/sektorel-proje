@@ -18,3 +18,15 @@ spring:
     username: postgres
     password: 1234 
     driver-class-name: org.postgresql.Driver
+    
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ozkanarda1536290@gmail.com
+    password: lsekvwkiuadzarcb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
