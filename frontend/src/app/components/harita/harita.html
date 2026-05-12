@@ -1,49 +1,44 @@
 <div class="map-container">
   <div class="map-header">
     <h1 class="page-title">Coğrafi Depo Dağılımı</h1>
-    <p>Ülke genelindeki detaylı lojistik ağımızı ve depo durumlarını anlık takip edin.</p>
+    <p>Operasyonel ağımızın Türkiye üzerindeki gerçek zamanlı dağılımı.</p>
   </div>
   
   <div class="map-wrapper">
-    <div class="map-sub-wrapper">
-      <img src="assets/images/turkiye_detayli_harita.png" class="tr-map-image">
+    <svg viewBox="0 0 1000 480" class="tr-map-svg" preserveAspectRatio="xMidYMid meet">
+      <path class="tr-land" d="M128.2,74.5c-5.6-3.1-11.5-5.3-17.7-6.5c-9.1-1.8-18.4-1.2-27.4,1.8c-7.2,2.4-13.8,6.1-19.6,11c-6.1,5.2-11.1,11.5-14.8,18.7c-3.5,6.8-5.3,14.3-5.3,21.9c0,11.3,4.1,22.1,11.6,30.5c6.5,7.3,14.7,13,23.8,16.4c5.1,1.9,10.4,3.2,15.8,3.9c13.7,1.8,27.6,0.3,40.7-4.5c8.2-3,15.7-7.7,21.9-13.8c7.3-7.2,12.4-16,14.8-25.7c1.3-5.2,1.7-10.6,1.2-15.9c-0.8-9.4-4.2-18.3-9.9-25.9C155.7,80.1,142.7,75.1,128.2,74.5z M195,120 L250,80 L450,110 L650,90 L850,100 L950,130 L980,180 L990,260 L960,330 L920,390 L850,420 L750,430 L650,440 L550,445 L450,435 L350,415 L250,395 L150,375 L80,335 L30,285 L10,225 L20,175 L60,145 Z" />
       
-      <div *ngFor="let depo of depoListesi" 
-           (mouseenter)="detayGoster(depo)" 
-           class="marker-group"
-           [style.left.px]="depo.coords.x" 
-           [style.top.px]="depo.coords.y">
+      <g *ngFor="let depo of depoListesi" (mouseenter)="detayGoster(depo)" class="marker-group">
+        <circle [attr.cx]="depo.coords.x" [attr.cy]="depo.coords.y" r="16" 
+                [class.pulse-red]="depo.durum === 'KRİTİK'"
+                [class.pulse-blue]="depo.durum === 'NORMAL'"
+                [class.pulse-gray]="depo.durum === 'KURULUM BEKLİYOR'" />
         
-        <div class="status-circle"
-             [class.pulse-red]="depo.durum === 'KRİTİK'"
-             [class.pulse-blue]="depo.durum === 'NORMAL'"
-             [class.pulse-gray]="depo.durum === 'KURULUM BEKLİYOR'"></div>
-        
-        <div class="main-dot"
-             [style.background]="depo.durum === 'KRİTİK' ? '#ef4444' : (depo.durum === 'NORMAL' ? '#38bdf8' : '#94a3b8')"></div>
-      </div>
-    </div>
+        <circle [attr.cx]="depo.coords.x" [attr.cy]="depo.coords.y" r="6" 
+                [attr.fill]="depo.durum === 'KRİTİK' ? '#ef4444' : (depo.durum === 'NORMAL' ? '#38bdf8' : '#94a3b8')"
+                stroke="white" stroke-width="2" />
+      </g>
+    </svg>
 
     <div class="map-info-card" *ngIf="seciliDepo">
-      <div class="info-header" 
-           [style.background]="seciliDepo.durum === 'KRİTİK' ? '#ef4444' : '#0f172a'">
+      <div class="info-header" [class.bg-red]="seciliDepo.durum === 'KRİTİK'">
         {{ seciliDepo.ad }}
       </div>
       <div class="info-body">
         <p>📍 Şehir: <strong>{{ seciliDepo.sehir }}</strong></p>
         <p>📦 Ürün: <strong>{{ seciliDepo.urun }}</strong></p>
         <hr>
-        <div *ngIf="seciliDepo.durum !== 'KURULUM BEKLİYOR'" class="temp-info">
-          Sıcaklık: <strong [class.text-danger]="seciliDepo.durum === 'KRİTİK'">{{ seciliDepo.sicaklik }}°C</strong>
+        <div *ngIf="seciliDepo.durum !== 'KURULUM BEKLİYOR'" class="temp-display">
+          Sıcaklık: <strong [class.text-red]="seciliDepo.durum === 'KRİTİK'">{{ seciliDepo.sicaklik }}°C</strong>
         </div>
-        <div *ngIf="seciliDepo.durum === 'KURULUM BEKLİYOR'" class="pending-info">🛠️ Kurulum Bekleniyor</div>
+        <div *ngIf="seciliDepo.durum === 'KURULUM BEKLİYOR'" class="pending-status">🛠️ Kurulum Aşamasında</div>
       </div>
     </div>
   </div>
 
   <div class="map-legend">
-    <div class="legend-item"><span class="dot blue"></span> Normal İzleme</div>
-    <div class="legend-item"><span class="dot red"></span> Kritik Alarm</div>
-    <div class="legend-item"><span class="dot gray"></span> Kurulum</div>
+    <div class="legend-item"><span class="dot blue"></span> Aktif İstasyon</div>
+    <div class="legend-item"><span class="dot red"></span> Kritik Eşik Aşımı</div>
+    <div class="legend-item"><span class="dot gray"></span> Planlanan Kurulum</div>
   </div>
 </div>
