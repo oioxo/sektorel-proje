@@ -1,0 +1,49 @@
+<div class="map-container">
+  <div class="map-header">
+    <h1 class="page-title">Coğrafi Depo Dağılımı</h1>
+    <p>Ülke genelindeki detaylı lojistik ağımızı ve depo durumlarını anlık takip edin.</p>
+  </div>
+  
+  <div class="map-wrapper">
+    <div class="map-sub-wrapper">
+      <img src="assets/images/turkiye_detayli_harita.png" class="tr-map-image">
+      
+      <div *ngFor="let depo of depoListesi" 
+           (mouseenter)="detayGoster(depo)" 
+           class="marker-group"
+           [style.left.px]="depo.coords.x" 
+           [style.top.px]="depo.coords.y">
+        
+        <div class="status-circle"
+             [class.pulse-red]="depo.durum === 'KRİTİK'"
+             [class.pulse-blue]="depo.durum === 'NORMAL'"
+             [class.pulse-gray]="depo.durum === 'KURULUM BEKLİYOR'"></div>
+        
+        <div class="main-dot"
+             [style.background]="depo.durum === 'KRİTİK' ? '#ef4444' : (depo.durum === 'NORMAL' ? '#38bdf8' : '#94a3b8')"></div>
+      </div>
+    </div>
+
+    <div class="map-info-card" *ngIf="seciliDepo">
+      <div class="info-header" 
+           [style.background]="seciliDepo.durum === 'KRİTİK' ? '#ef4444' : '#0f172a'">
+        {{ seciliDepo.ad }}
+      </div>
+      <div class="info-body">
+        <p>📍 Şehir: <strong>{{ seciliDepo.sehir }}</strong></p>
+        <p>📦 Ürün: <strong>{{ seciliDepo.urun }}</strong></p>
+        <hr>
+        <div *ngIf="seciliDepo.durum !== 'KURULUM BEKLİYOR'" class="temp-info">
+          Sıcaklık: <strong [class.text-danger]="seciliDepo.durum === 'KRİTİK'">{{ seciliDepo.sicaklik }}°C</strong>
+        </div>
+        <div *ngIf="seciliDepo.durum === 'KURULUM BEKLİYOR'" class="pending-info">🛠️ Kurulum Bekleniyor</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="map-legend">
+    <div class="legend-item"><span class="dot blue"></span> Normal İzleme</div>
+    <div class="legend-item"><span class="dot red"></span> Kritik Alarm</div>
+    <div class="legend-item"><span class="dot gray"></span> Kurulum</div>
+  </div>
+</div>

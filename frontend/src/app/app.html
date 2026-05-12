@@ -1,0 +1,7 @@
+<div class="app-wrapper">
+  <app-sidebar *ngIf="router.url !== '/login'"></app-sidebar>
+
+  <main class="main-content" [style.margin-left]="router.url === '/login' ? '0' : '260px'">
+    <router-outlet></router-outlet>
+  </main>
+</div>

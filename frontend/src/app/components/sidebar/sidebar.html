@@ -1,0 +1,30 @@
+<div class="sidebar">
+  <div class="logo">
+    <h3>DEPO<span>CONTROL</span></h3>
+  </div>
+  
+  <nav>
+    <a routerLink="/depolarim" routerLinkActive="active">
+      <i class="icon">📡</i> Canlı İzleme
+    </a>
+
+    <a *ngIf="rol === 'admin'" routerLink="/dashboard" routerLinkActive="active">
+      <i class="icon">➕</i> Yeni Depo Ekle
+    </a>
+
+    <a routerLink="/harita" routerLinkActive="active">
+      <i class="icon">📍</i> Depo Haritası
+    </a>
+
+    <div *ngIf="rol === 'admin'" class="nav-divider"></div>
+
+    <a *ngIf="rol === 'admin'" routerLink="/admin" routerLinkActive="active">
+      <i class="icon">⚙️</i> Sistem Ayarları
+    </a>
+  </nav>
+
+  <div class="user-info">
+    <div class="user-dot"></div>
+    <p>{{ rol === 'admin' ? 'Yönetici' : 'Operatör' }}: <strong>Arda</strong></p>
+  </div>
+</div>

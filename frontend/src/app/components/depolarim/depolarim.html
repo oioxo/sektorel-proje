@@ -1,0 +1,52 @@
+<div class="monitor-container">
+  <div class="header-section">
+    <h1 class="page-title">Canlı Depo İzleme Merkezi</h1>
+    <div class="live-indicator">
+      <span class="blink-dot"></span> CANLI VERİ AKIŞI
+    </div>
+  </div>
+
+  <div class="depo-grid">
+    <div *ngFor="let depo of depoListesi" class="depo-card" [class.danger-border]="depo.durum === 'KRİTİK'">
+      
+      <div class="card-header">
+        <div class="status-indicator">
+          <span class="status-dot" [class.dot-red]="depo.durum === 'KRİTİK'"></span>
+          <h3>{{ depo.ad }}</h3>
+        </div>
+        <span class="badge">ID: {{ depo.id }}</span>
+      </div>
+      
+      <div class="card-body">
+        <div class="info-row">
+          <span class="label">Saklanan Ürün:</span>
+          <span class="value">{{ depo.urun }}</span>
+        </div>
+        
+        <div class="temp-box">
+          <div class="temp-value" [class.text-red]="depo.durum === 'KRİTİK'">
+            {{ depo.sicaklik }}°C
+          </div>
+          <div class="temp-trend">Anlık Ölçüm</div>
+        </div>
+
+        <div class="threshold-bar">
+          <div class="threshold-label">Güvenli Eşik Üst Sınırı:</div>
+          <div class="threshold-value">{{ depo.maxEshik }}°C</div>
+        </div>
+
+        <div *ngIf="depo.durum === 'KRİTİK' && !depo.bildirimGonderildi" class="waiting-alert">
+          ⏳ Durum {{ bildirimLimitSuresi - depo.kritikSureSayaci }}s daha devam ederse kullanıcıya mail iletilecek.
+        </div>
+
+        <div *ngIf="depo.bildirimGonderildi" class="sent-alert">
+          📧 Kullanıcıya E-Posta Bildirimi Gönderildi!
+        </div>
+      </div>
+
+      <div *ngIf="depo.durum === 'KRİTİK'" class="alert-footer">
+        ⚠️ YÜKSEK SICAKLIK UYARISI!
+      </div>
+    </div>
+  </div>
+</div>

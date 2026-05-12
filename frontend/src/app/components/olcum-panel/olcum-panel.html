@@ -1,0 +1,49 @@
+<div class="dashboard-container">
+  <h1 class="page-title">Depo ve Sensör Yönetimi</h1>
+  
+  <div class="panel-card">
+    <div class="panel-header">
+      <h2>Yeni Depo ve Kurulum Kaydı</h2>
+      <p>Sistem bilgilerini girin; teknik ekibimiz sensör kurulumu için adresinize yönlendirilecektir.</p>
+    </div>
+
+    <div class="form-grid">
+      <div class="input-group">
+        <label>Depo Adı / Tanımı</label>
+        <input type="text" #depoAd placeholder="Örn: Batı Lojistik Merkezi" class="modern-input">
+      </div>
+
+      <div class="input-group">
+        <label>Bulunduğu Şehir</label>
+        <select #sehir class="modern-input">
+          <option value="">Şehir Seçiniz...</option>
+          <option *ngFor="let s of sehirler" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="input-group" style="grid-column: 1 / -1;">
+        <label>Saklanacak Ürün Tipi</label>
+        <select #urunId class="modern-input">
+          <option value="">Ürün Tipini Seçiniz...</option>
+          <option *ngFor="let urun of urunler" [value]="urun.id">{{ urun.ad }}</option>
+        </select>
+      </div>
+
+      <div class="input-group" style="grid-column: 1 / -1;">
+        <label>Kurulum Yapılacak Açık Adres</label>
+        <textarea #adres rows="3" placeholder="Mahalle, Sokak, No ve varsa depo kapı numarasını belirtiniz..." class="modern-input" style="resize: none;"></textarea>
+      </div>
+    </div>
+
+    <button class="submit-btn" (click)="kurulumTalebiOlustur(depoAd.value, sehir.value, urunId.value, adres.value)">
+      DEPOYU KAYDET VE KURULUM TALEBİ OLUŞTUR
+    </button>
+
+    <div *ngIf="mesaj" class="alert-box" [class.alert-danger]="mesaj.includes('DİKKAT')" [class.alert-success]="!mesaj.includes('DİKKAT')">
+      <div class="alert-content">
+        <span *ngIf="!mesaj.includes('DİKKAT')">🚀</span>
+        {{ mesaj }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>DEPO<span>CONTROL</span></h2>
+      <p>Sisteme erişmek için kimlik bilgilerinizi doğrulayın.</p>
+    </div>
+
+    <form class="login-form">
+      <div class="input-group">
+        <label>Kullanıcı Adı</label>
+        <input type="text" placeholder="Kullanıcı adınızı girin">
+      </div>
+      <div class="input-group">
+        <label>Şifre</label>
+        <input type="password" placeholder="••••••••">
+      </div>
+
+      <button type="button" class="login-btn" (click)="girisYap('admin')">Yönetici Girişi</button>
+      <button type="button" class="user-btn" (click)="girisYap('user')">Operatör Girişi</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,90 @@
+.admin-container {
+  padding: 40px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.admin-container h2 {
+  font-size: 26px;
+  color: #1e293b;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.admin-container p {
+  color: #64748b;
+  margin-bottom: 30px;
+  font-size: 15px;
+}
+
+.rules-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px; /* Boşluğu 30px'ten 15px'e düşürdük */
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 15px;
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.admin-table td {
+  padding: 15px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.admin-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.limit-input {
+  width: 100px;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1e293b;
+  transition: all 0.2s;
+}
+
+.limit-input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+.save-rules-btn {
+  display: block;
+  margin-left: auto; /* float: right yerine butonu sağa yaslamanın modern yolu */
+  background-color: #0f172a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-rules-btn:hover {
+  background-color: #1e293b;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

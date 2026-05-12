@@ -1,0 +1,29 @@
+<div class="admin-container">
+  <h2>⚙️ Sistem Kuralları ve Limit Yönetimi</h2>
+  <p>Tüm depolar için geçerli olacak global sıcaklık kısıtlamalarını buradan belirleyebilirsiniz.</p>
+
+  <div class="rules-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Ürün Kategorisi</th>
+          <th>Min. Sıcaklık (°C)</th>
+          <th>Max. Sıcaklık (°C)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let urun of urunKategorileri">
+          <td><strong>{{ urun.ad }}</strong></td>
+          <td>
+            <input type="number" [(ngModel)]="urun.min" class="limit-input">
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="urun.max" class="limit-input">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button class="save-rules-btn" (click)="kaydet()">Kısıtlamaları Kaydet</button>
+  </div>
+</div>
