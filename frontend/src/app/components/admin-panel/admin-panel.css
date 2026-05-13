@@ -1,18 +1,19 @@
 .admin-container {
   padding: 40px;
   animation: fadeIn 0.4s ease-out;
+  background-color: #f8fafc;
+  min-height: 100vh;
 }
 
-.admin-container h2 {
+.section-header h2 {
   font-size: 26px;
   color: #1e293b;
-  margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-.admin-container p {
+.section-header p {
   color: #64748b;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   font-size: 15px;
 }
 
@@ -20,14 +21,13 @@
   background: white;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
 }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 15px; /* Boşluğu 30px'ten 15px'e düşürdük */
 }
 
 .admin-table th {
@@ -42,46 +42,62 @@
 .admin-table td {
   padding: 15px;
   border-bottom: 1px solid #f1f5f9;
-  color: #1e293b;
   vertical-align: middle;
 }
 
-.admin-table tr:hover {
-  background-color: #f8fafc;
+/* Kategori ismi sütunu */
+.category-name {
+  color: #1e293b;
+  font-size: 15px;
+}
+
+/* Input ve Derece simgesini yan yana tutan sihirli dokunuş */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .limit-input {
-  width: 100px;
+  width: 80px;
   padding: 10px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  font-size: 14px;
-  color: #1e293b;
-  transition: all 0.2s;
+  text-align: center;
+  font-weight: 600;
 }
 
-.limit-input:focus {
-  outline: none;
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+.unit {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Butonun olduğu alt kısım */
+.action-footer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end; /* Butonu sağa yaslar */
 }
 
 .save-rules-btn {
-  display: block;
-  margin-left: auto; /* float: right yerine butonu sağa yaslamanın modern yolu */
   background-color: #0f172a;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
+  padding: 14px 28px;
+  border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .save-rules-btn:hover {
   background-color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
 }
 
 @keyframes fadeIn {

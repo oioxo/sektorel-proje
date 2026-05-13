@@ -1,32 +1,36 @@
 server:
-  port: 8044 # (Localhost:8044'ten bağlanacak)
+  port: 8044
 
 spring:
   jpa:
     hibernate:
-      ddl-auto: update # Tabloları otomatik oluşturur/günceller
-    show-sql: true # Konsolda SQL sorgularını görmek için
+      ddl-auto: update
+    show-sql: true
   
   servlet:
     multipart:
-      max-file-size: 10MB # Yüklenecek maksimum dosya boyutu
+      max-file-size: 10MB
       max-request-size: 10MB
 
-   # Database Configuration
   datasource:
-    url: jdbc:postgresql:**********************
-    username: *********
-    password:*********
+    url: jdbc:postgresql://localhost:5432/akilli_operasyon_db 
+    username: postgres
+    password: 1234 
     driver-class-name: org.postgresql.Driver
     
   mail:
     host: smtp.gmail.com
     port: 587
-    username: **************@gmail.com
-    password: *************
+    username: ozkanarda1536290@gmail.com
+    password: lsekvwkiuadzarcb # Buraya Gmail uygulama şifreni yaz
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+
+# ARTIK EN SOLDA VE DOĞRU HİZADA
+app:
+  notification:
+    supervisor-email: "serhanogurlu@gmail.com"

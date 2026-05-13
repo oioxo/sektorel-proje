@@ -1,7 +1,9 @@
 <div class="admin-container">
   <section class="admin-section">
-    <h2>⚙️ Sistem Kuralları ve Limit Yönetimi</h2>
-    <p>Tüm depolar için geçerli olacak global sıcaklık kısıtlamalarını buradan belirleyebilirsiniz.</p>
+    <div class="section-header">
+      <h2>⚙️ Sistem Kuralları ve Limit Yönetimi</h2>
+      <p>Tüm depolar için geçerli olacak global sıcaklık kısıtlamalarını buradan güncelleyebilirsiniz.</p>
+    </div>
 
     <div class="rules-card">
       <table class="admin-table">
@@ -14,63 +16,28 @@
         </thead>
         <tbody>
           <tr *ngFor="let urun of urunKategorileri">
-            <td><strong>{{ urun.ad }}</strong></td>
+            <td class="category-name"><strong>{{ urun.ad }}</strong></td>
             <td>
-              <input type="number" [(ngModel)]="urun.min" class="limit-input">
+              <div class="input-wrapper">
+                <input type="number" [(ngModel)]="urun.min" class="limit-input" placeholder="Min">
+                <span class="unit">°C</span>
+              </div>
             </td>
             <td>
-              <input type="number" [(ngModel)]="urun.max" class="limit-input">
+              <div class="input-wrapper">
+                <input type="number" [(ngModel)]="urun.max" class="limit-input" placeholder="Max">
+                <span class="unit">°C</span>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
-      <button class="save-rules-btn" (click)="limitleriGuncelle()">Kısıtlamaları Kaydet</button>
-    </div>
-  </section>
 
-  <hr class="section-divider">
-
-  <section class="admin-section">
-    <h2>🏢 Yeni Depo ve Kurulum Kaydı</h2>
-    <p>Sistem bilgilerini girin; teknik ekibimiz sensör kurulumu için en kısa sürede iletişime geçecektir.</p>
-
-    <div class="form-card">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Depo Adı / Tanımı</label>
-          <input type="text" [(ngModel)]="yeniDepo.ad" placeholder="Örn: Ankara Merkez Silo" class="form-input">
-        </div>
-
-        <div class="form-group">
-          <label>Bulunduğu Şehir</label>
-          <select [(ngModel)]="yeniDepo.sehir" class="form-input">
-            <option value="" disabled>Şehir Seçiniz...</option>
-            <option value="Ankara">Ankara</option>
-            <option value="İstanbul">İstanbul</option>
-            <option value="İzmir">İzmir</option>
-            <option value="Eskişehir">Eskişehir</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-          <label>Saklanacak Ürün Tipi</label>
-          <select [(ngModel)]="yeniDepo.urunId" class="form-input">
-            <option [ngValue]="null" disabled>Ürün Tipini Seçiniz...</option>
-            <option *ngFor="let kat of urunKategorileri" [ngValue]="kat.id">
-              {{ kat.ad }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group full-width">
-          <label>Kurulum Yapılacak Açık Adres</label>
-          <textarea [(ngModel)]="yeniDepo.adres" placeholder="Mahalle, Sokak, No..." class="form-input" rows="3"></textarea>
-        </div>
+      <div class="action-footer">
+        <button class="save-rules-btn" (click)="limitleriGuncelle()">
+          <span class="btn-icon">💾</span> Kısıtlamaları Kaydet
+        </button>
       </div>
-
-      <button class="submit-btn" (click)="depoyuKaydet()">
-        DEPOYU KAYDET VE KURULUM TALEBİ OLUŞTUR
-      </button>
     </div>
   </section>
 </div>

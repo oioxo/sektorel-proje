@@ -23,7 +23,11 @@ export class DepolarimComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.dataService.currentLimitler.subscribe(res => this.limitler = res);
-    this.dataService.currentDepolar.subscribe(res => this.depoListesi = res);
+    this.dataService.currentDepolar.subscribe(res => {
+      this.depoListesi = res;
+      // Ekrana gelir gelmez eşik değerlerini dolduruyoruz (Boş görünmesini engeller)
+      this.esikleriDoldur();
+    });
 
     this.interval = setInterval(() => {
       this.depoListesi.forEach(depo => {
@@ -31,7 +35,8 @@ export class DepolarimComponent implements OnInit, OnDestroy {
         const degisim = (Math.random() - 0.5);
         depo.sicaklik = parseFloat((depo.sicaklik + degisim).toFixed(1));
 
-        const ilgiliLimit = this.limitler.find(l => l.id === depo.urunId);
+        // KRİTİK DEĞİŞİKLİK: Artık urunId yerine direkt Ürün ADINA (depo.urun) göre arıyoruz!
+        const ilgiliLimit = this.limitler.find(l => l.ad === depo.urun);
         
         if (ilgiliLimit) {
           depo.maxEshik = ilgiliLimit.max;
@@ -59,15 +64,23 @@ export class DepolarimComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
+  // İlk açılışta kartların boş kalmaması için yardımcı fonksiyon
+  esikleriDoldur() {
+    this.depoListesi.forEach(depo => {
+      const ilgiliLimit = this.limitler.find(l => l.ad === depo.urun);
+      if (ilgiliLimit) {
+        depo.maxEshik = ilgiliLimit.max;
+      }
+    });
+  }
+
   gercekMailGonder(depo: any) {
-    // Kendi mail adresini buraya tam yaz
     const mailVerisi = {
       to: "ozkanarda1536290@gmail.com", 
       subject: `⚠️ KRİTİK SICAKLIK UYARISI: ${depo.ad}`,
       body: `Dikkat! ${depo.ad} deposunda sıcaklık ${depo.sicaklik}°C seviyesine ulaştı. Belirlenen üst limit: ${depo.maxEshik}°C.`
     };
 
-    // KRİTİK: Port 8044 olarak güncellendi!
     this.http.post('http://localhost:8044/api/notifications/send-email', mailVerisi)
       .subscribe({
         next: (res) => {
@@ -76,8 +89,6 @@ export class DepolarimComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error("❌ Mail hatası! Backend'e ulaşılamadı veya SMTP ayarı yanlış:", err);
-          // Hata olsa bile kullanıcıyı spam'lememek için bayrağı çekebilirsin
-          // depo.bildirimGonderildi = true; 
         }
       });
   }

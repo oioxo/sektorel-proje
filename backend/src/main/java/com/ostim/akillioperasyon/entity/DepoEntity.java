@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// ... diğer importlar
 @Entity
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import lombok.Setter;
 public class DepoEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO yerine IDENTITY yaptık!
     private Long id;
 
     @Column(name = "depo_kodu")
@@ -27,5 +28,4 @@ public class DepoEntity {
     @ManyToOne
     @JoinColumn(name = "isyeri_entity_id")
     private IsyeriEntity isyeriEntity;
-
 }

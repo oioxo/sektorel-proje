@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { tap, map } from 'rxjs/operators'; // map operatörünü ekledik
+import { tap, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -16,12 +16,10 @@ export class DataService {
     { id: 4, ad: 'Tahıl', min: 10, max: 20 }
   ]);
 
-  // Depolar listesi - Başlangıçta boş, backend'den dolacak
   private depolar = new BehaviorSubject<any[]>([]);
-
   private kullaniciRolu = new BehaviorSubject<string>('admin');
+  
   currentRol = this.kullaniciRolu.asObservable();
-
   currentLimitler = this.urunLimitleri.asObservable();
   currentDepolar = this.depolar.asObservable();
 
@@ -29,58 +27,84 @@ export class DataService {
     this.depolariYukle();
   }
 
-  // Veritabanından verileri çeker ve BehaviorSubject'i günceller
+  private temizSehirIsmi(kod: string): string {
+    if (!kod) return 'Bilinmiyor';
+    const k = kod.toUpperCase();
+    if (k.includes('ANK') || k.includes('ANKARA')) return 'Ankara';
+    if (k.includes('ADA') || k.includes('ADANA')) return 'Adana';
+    if (k.includes('IST') || k.includes('ISTANBUL')) return 'İstanbul';
+    if (k.includes('IZM') || k.includes('IZMIR')) return 'İzmir';
+    if (k.includes('KON') || k.includes('KONYA')) return 'Konya';
+    return kod.charAt(0).toUpperCase() + kod.slice(1).toLowerCase();
+  }
+
+  // --- GETİRME VE TRUVA ATINI AÇMA ---
   depolariYukle() {
     this.http.get<any[]>(`${this.apiUrl}/depo/all`).subscribe({
       next: (data) => {
-        console.log("Backend'den gelen depolar:", data);
-        this.depolar.next(data);
+        const formatliDepolar = data.map(backendDepo => {
+          
+          // ŞİFREYİ ÇÖZÜYORUZ: "Depo Adı||Ürün Tipi"
+          const hamAciklama = backendDepo.depoAciklama || '';
+          const parcalar = hamAciklama.split('||'); // || işaretinden ikiye böl
+          
+          const gercekAd = parcalar[0] || 'İsimsiz Depo';
+          // Eğer önceden eklenmiş eski kayıtsa (şifresizse) varsayılan Tahıl yap, yenisiyse 2. parçayı al
+          const gercekUrun = parcalar[1] || 'Tahıl'; 
+
+          return {
+            id: backendDepo.id,
+            ad: gercekAd,
+            sehir: this.temizSehirIsmi(backendDepo.depoKodu || ''),
+            urun: gercekUrun,
+            sicaklik: 18.5,
+            durum: 'NORMAL',
+            kritikSureSayaci: 0,
+            bildirimGonderildi: false
+          };
+        });
+        
+        this.depolar.next(formatliDepolar);
       },
       error: (err) => console.error("Depolar yüklenirken veritabanı hatası:", err)
     });
   }
 
-  /**
-   * KRİTİK DÜZELTME: Harita verilerini el ile yazmak yerine 
-   * mevcut depolardan dinamik olarak hesaplıyoruz.
-   */
   sehirVerileriniGetir(): Observable<any> {
     return this.currentDepolar.pipe(
       map(depoListesi => {
         const sehirSayilari: any = {};
-        
         depoListesi.forEach(depo => {
-          // Örn: depo.sehir "Adana" ise sehirSayilari["Adana"] artacak
-          if (depo.sehir) {
+          if (depo.sehir && depo.sehir !== 'Bilinmiyor') {
             sehirSayilari[depo.sehir] = (sehirSayilari[depo.sehir] || 0) + 1;
           }
         });
-
-        console.log("Harita için hesaplanan şehir yoğunlukları:", sehirSayilari);
         return sehirSayilari;
       })
     );
   }
 
   getColor(d: number) {
-    // Yoğunluk 1 bile olsa haritada görünmesi için alt sınırı 0 yaptık
-    return d > 50  ? '#ef4444' : 
-           d > 20  ? '#f97316' : 
-           d > 10  ? '#facc15' : 
-           d > 0   ? '#94a3b8' : // En az 1 depo varsa gri/mavi boya
-                     '#f1f5f9';  // Depo yoksa boş renk
+    return d > 0 ? '#94a3b8' : '#f1f5f9';  
   }
 
   limitGuncelle(yeniLimitler: any[]) {
     this.urunLimitleri.next(yeniLimitler);
   }
 
+  // --- KAYDETME VE TRUVA ATINI PAKETLEME ---
   depoEkle(yeniDepo: any) {
-    return this.http.post(`${this.apiUrl}/depo/save`, yeniDepo).pipe(
-      tap(() => {
-        console.log("Yeni depo kaydedildi, liste tazeleniyor...");
-        this.depolariYukle(); // Kayıttan sonra listeyi DB'den tekrar çek
-      })
+    const secilenUrunAd = yeniDepo.urun || 'Tahıl';
+
+    const backendFormati = {
+      // ŞİFREYİ OLUŞTURUYORUZ: İsim ve Ürünü araya || koyarak birleştirip gönderiyoruz!
+      depoAciklama: `${yeniDepo.ad}||${secilenUrunAd}`,       
+      depoKodu: yeniDepo.sehir,        
+      isyeriId: 1                      
+    };
+
+    return this.http.post(`${this.apiUrl}/depo/save`, backendFormati).pipe(
+      tap(() => this.depolariYukle())
     );
   }
 

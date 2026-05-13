@@ -1,19 +1,19 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // KRİTİK: ngModel için şart
+import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data';
 
 @Component({
   selector: 'app-olcum-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule], // FormsModule'ü buraya ekledik
+  imports: [CommonModule, FormsModule],
   templateUrl: './olcum-panel.html',
   styleUrl: './olcum-panel.css'
 })
 export class OlcumPanelComponent {
   mesaj: string = "";
   
-  // Form verilerini tek bir nesne içinde topluyoruz (HTML ile tam uyumlu)
+  // Form verileri
   yeniDepo: any = {
     ad: '',
     sehir: '',
@@ -35,33 +35,40 @@ export class OlcumPanelComponent {
   constructor(private dataService: DataService) {}
 
   kurulumTalebiOlustur() {
-    // Nesne üzerinden kontrol yapıyoruz
+    // 1. Validasyon Kontrolü
     if (!this.yeniDepo.ad || !this.yeniDepo.sehir || !this.yeniDepo.urunId || !this.yeniDepo.adres) {
-      this.mesaj = "DİKKAT: Lütfen tüm alanları eksiksiz doldurunuz!";
+      this.mesaj = "⚠️ DİKKAT: Lütfen tüm alanları eksiksiz doldurunuz!";
       return;
     }
 
     const secilenUrun = this.urunler.find(u => u.id === Number(this.yeniDepo.urunId));
 
+    // Backend'in beklediği ham veri (çeviri data.ts içinde yapılacak)
     const kaydedilecekVeri = {
-      id: Math.floor(Math.random() * 1000),
       ad: this.yeniDepo.ad,
       sehir: this.yeniDepo.sehir,
       urun: secilenUrun?.ad,
       urunId: Number(this.yeniDepo.urunId),
-      sicaklik: 0,
-      durum: 'KURULUM BEKLİYOR',
-      adres: this.yeniDepo.adres,
-      kritikSureSayaci: 0,
-      bildirimGonderildi: false
+      sicaklik: 18.5, // Varsayılan başlangıç sıcaklığı
+      durum: 'NORMAL',
+      adres: this.yeniDepo.adres
     };
 
-    // Servis üzerinden gönder
-    this.dataService.depoEkle(kaydedilecekVeri);
-
-    this.mesaj = `Tebrikler! "${this.yeniDepo.ad}" kaydı alındı. Teknik ekibimiz sensör kurulumu için en kısa sürede ${this.yeniDepo.sehir} şubemiz üzerinden sizinle iletişime geçecektir.`;
-    
-    // Formu temizle (Opsiyonel)
-    this.yeniDepo = { ad: '', sehir: '', urunId: '', adres: '' };
+    // 2. KRİTİK NOKTA: .subscribe() ekleyerek isteği gerçekten gönderiyoruz
+    this.dataService.depoEkle(kaydedilecekVeri).subscribe({
+      next: (res) => {
+        // Kayıt başarılıysa mesajı göster ve formu temizle
+        this.mesaj = `🚀 Tebrikler Arda! "${this.yeniDepo.ad}" kaydı başarıyla alındı. Haritayı kontrol edebilirsin.`;
+        console.log("Veritabanına kayıt başarıyla işlendi:", res);
+        
+        // Formu temizle
+        this.yeniDepo = { ad: '', sehir: '', urunId: '', adres: '' };
+      },
+      error: (err) => {
+        // Hata durumunda logla
+        console.error("Depo eklenirken hata oluştu:", err);
+        this.mesaj = "❌ Hata: Kayıt PostgreSQL'e iletilemedi. Backend bağlantısını kontrol et!";
+      }
+    });
   }
 }
