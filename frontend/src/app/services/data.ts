@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { tap, map } from 'rxjs/operators'; // map operatörünü ekledik
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-  // Mevcut Ürün Limitleri
+  private apiUrl = 'http://localhost:8044/api'; 
+
   private urunLimitleri = new BehaviorSubject<any[]>([
     { id: 1, ad: 'Kırmızı Et', min: -20, max: -18 },
     { id: 2, ad: 'Tavuk', min: -2, max: 4 },
@@ -13,58 +16,72 @@ export class DataService {
     { id: 4, ad: 'Tahıl', min: 10, max: 20 }
   ]);
 
-  // Mevcut Depolar
-  private depolar = new BehaviorSubject<any[]>([
-    { id: 1, ad: 'Ankara Merkez Silo', urun: 'Tahıl', urunId: 4, sicaklik: 18.5, durum: 'NORMAL', kritikSureSayaci: 0, bildirimGonderildi: false },
-    { id: 2, ad: 'İstanbul Et Deposu', urun: 'Kırmızı Et', urunId: 1, sicaklik: -19.2, durum: 'NORMAL', kritikSureSayaci: 0, bildirimGonderildi: false }
-  ]);
+  // Depolar listesi - Başlangıçta boş, backend'den dolacak
+  private depolar = new BehaviorSubject<any[]>([]);
 
-  // Rol Takibi
-  private kullaniciRolu = new BehaviorSubject<string>('operator');
+  private kullaniciRolu = new BehaviorSubject<string>('admin');
   currentRol = this.kullaniciRolu.asObservable();
 
   currentLimitler = this.urunLimitleri.asObservable();
   currentDepolar = this.depolar.asObservable();
 
-  // --- HARİTA İÇİN GEREKLİ YENİ FONKSİYONLAR ---
+  constructor(private http: HttpClient) {
+    this.depolariYukle();
+  }
 
-  /**
-   * Şehir bazlı depo sayılarını döner. 
-   * GeoJSON üzerindeki 'name' alanı ile buradaki anahtarlar (İstanbul, Ankara vb.) eşleşmelidir.
-   */
-  sehirVerileriniGetir() {
-    return of({
-      "İstanbul": 52,
-      "Ankara": 25,
-      "İzmir": 18,
-      "Bursa": 15,
-      "Antalya": 10,
-      "Samsun": 8,
-      "Erzurum": 3
+  // Veritabanından verileri çeker ve BehaviorSubject'i günceller
+  depolariYukle() {
+    this.http.get<any[]>(`${this.apiUrl}/depo/all`).subscribe({
+      next: (data) => {
+        console.log("Backend'den gelen depolar:", data);
+        this.depolar.next(data);
+      },
+      error: (err) => console.error("Depolar yüklenirken veritabanı hatası:", err)
     });
   }
 
   /**
-   * Depo yoğunluğuna göre renk kodu döndürür.
-   * TMO ve benzeri kurumsal sistemlerdeki 'Yoğunluk Haritası' mantığıdır.
+   * KRİTİK DÜZELTME: Harita verilerini el ile yazmak yerine 
+   * mevcut depolardan dinamik olarak hesaplıyoruz.
    */
-  getColor(d: number) {
-    return d > 50  ? '#ef4444' : // Kritik Yoğunluk: Kırmızı
-           d > 20  ? '#f97316' : // Yüksek: Turuncu
-           d > 10  ? '#facc15' : // Orta: Sarı
-           d > 0   ? '#94a3b8' : // Düşük: Gri (Mavi-Gri)
-                     '#f1f5f9';  // Veri Yok: Çok Açık Gri
+  sehirVerileriniGetir(): Observable<any> {
+    return this.currentDepolar.pipe(
+      map(depoListesi => {
+        const sehirSayilari: any = {};
+        
+        depoListesi.forEach(depo => {
+          // Örn: depo.sehir "Adana" ise sehirSayilari["Adana"] artacak
+          if (depo.sehir) {
+            sehirSayilari[depo.sehir] = (sehirSayilari[depo.sehir] || 0) + 1;
+          }
+        });
+
+        console.log("Harita için hesaplanan şehir yoğunlukları:", sehirSayilari);
+        return sehirSayilari;
+      })
+    );
   }
 
-  // --- MEVCUT METOTLAR ---
+  getColor(d: number) {
+    // Yoğunluk 1 bile olsa haritada görünmesi için alt sınırı 0 yaptık
+    return d > 50  ? '#ef4444' : 
+           d > 20  ? '#f97316' : 
+           d > 10  ? '#facc15' : 
+           d > 0   ? '#94a3b8' : // En az 1 depo varsa gri/mavi boya
+                     '#f1f5f9';  // Depo yoksa boş renk
+  }
 
   limitGuncelle(yeniLimitler: any[]) {
     this.urunLimitleri.next(yeniLimitler);
   }
 
   depoEkle(yeniDepo: any) {
-    const mevcutDepolar = this.depolar.getValue();
-    this.depolar.next([...mevcutDepolar, yeniDepo]);
+    return this.http.post(`${this.apiUrl}/depo/save`, yeniDepo).pipe(
+      tap(() => {
+        console.log("Yeni depo kaydedildi, liste tazeleniyor...");
+        this.depolariYukle(); // Kayıttan sonra listeyi DB'den tekrar çek
+      })
+    );
   }
 
   rolGuncelle(yeniRol: string) {

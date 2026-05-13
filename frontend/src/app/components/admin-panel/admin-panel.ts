@@ -11,7 +11,20 @@ import { DataService } from '../../services/data';
   styleUrl: './admin-panel.css'
 })
 export class AdminPanelComponent {
-  // data.ts içindeki isimlerle (min, max) birebir eşitledik
+  // Form verilerini tutacak nesne
+  yeniDepo = {
+    ad: '',
+    sehir: '',
+    urunId: null,
+    urun: '', // ID'ye göre otomatik dolacak
+    adres: '',
+    sicaklik: 18.0, // Başlangıç simülasyon değeri
+    durum: 'NORMAL',
+    kritikSureSayaci: 0,
+    bildirimGonderildi: false
+  };
+
+  // Ürün kategorileri (data.ts ile uyumlu)
   urunKategorileri = [
     { id: 1, ad: 'Kırmızı Et', min: -20, max: -18 },
     { id: 2, ad: 'Tavuk', min: -2, max: 4 },
@@ -21,9 +34,44 @@ export class AdminPanelComponent {
 
   constructor(private dataService: DataService) {}
 
-  kaydet() {
-    // Servisteki limitGuncelle fonksiyonuna bu listeyi gönderiyoruz
+  // --- 1. FONKSİYON: Yeni Depoyu Veritabanına Kaydet ---
+  depoyuKaydet() {
+    // Seçilen ürün ID'sine göre ürün adını bulalım
+    const secilenUrun = this.urunKategorileri.find(u => u.id == this.yeniDepo.urunId);
+    if (secilenUrun) {
+      this.yeniDepo.urun = secilenUrun.ad;
+    }
+
+    // DataService üzerindeki POST isteğini tetikle
+    this.dataService.depoEkle(this.yeniDepo).subscribe({
+      next: (res) => {
+        alert(`Tebrikler! "${this.yeniDepo.ad}" kaydı alındı ve PostgreSQL'e işlendi.`);
+        this.formuSifirla();
+      },
+      error: (err) => {
+        console.error("Depo kaydedilirken hata oluştu:", err);
+        alert("Hata! Backend (8044) çalışıyor mu ve Postgres bağlantısı tamam mı?");
+      }
+    });
+  }
+
+  // --- 2. FONKSİYON: Mevcut Limitleri Güncelle ---
+  limitleriGuncelle() {
     this.dataService.limitGuncelle(this.urunKategorileri);
-    alert("Sistem kısıtlamaları başarıyla güncellendi!");
+    alert("Sistem kısıtlamaları (Frontend seviyesinde) güncellendi!");
+  }
+
+  formuSifirla() {
+    this.yeniDepo = {
+      ad: '',
+      sehir: '',
+      urunId: null,
+      urun: '',
+      adres: '',
+      sicaklik: 18.0,
+      durum: 'NORMAL',
+      kritikSureSayaci: 0,
+      bildirimGonderildi: false
+    };
   }
 }

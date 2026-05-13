@@ -36,7 +36,7 @@
         </div>
 
         <div *ngIf="depo.durum === 'KRİTİK' && !depo.bildirimGonderildi" class="waiting-alert">
-          ⏳ Durum {{ bildirimLimitSuresi - depo.kritikSureSayaci }}s daha devam ederse kullanıcıya mail iletilecek.
+          ⏳ Durum {{ (bildirimLimitSuresi - depo.kritikSureSayaci) > 0 ? (bildirimLimitSuresi - depo.kritikSureSayaci) : 0 }}s daha devam ederse kullanıcıya mail iletilecek.
         </div>
 
         <div *ngIf="depo.bildirimGonderildi" class="sent-alert">

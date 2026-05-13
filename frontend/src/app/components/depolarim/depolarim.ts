@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HttpClient } from '@angular/common/http'; // HttpClient ekledik
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { DataService } from '../../services/data';
 
 @Component({
   selector: 'app-depolarim',
   standalone: true,
-  imports: [CommonModule, HttpClientModule], // HttpClientModule ekledik
+  imports: [CommonModule, HttpClientModule],
   templateUrl: './depolarim.html',
   styleUrl: './depolarim.css'
 })
@@ -14,11 +14,11 @@ export class DepolarimComponent implements OnInit, OnDestroy {
   interval: any;
   depoListesi: any[] = [];
   limitler: any[] = [];
-  bildirimLimitSuresi = 10;
+  bildirimLimitSuresi = 10; // Saniye
 
   constructor(
     private dataService: DataService,
-    private http: HttpClient // Http enjekte edildi
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -27,6 +27,7 @@ export class DepolarimComponent implements OnInit, OnDestroy {
 
     this.interval = setInterval(() => {
       this.depoListesi.forEach(depo => {
+        // Sıcaklık Simülasyonu
         const degisim = (Math.random() - 0.5);
         depo.sicaklik = parseFloat((depo.sicaklik + degisim).toFixed(1));
 
@@ -37,13 +38,18 @@ export class DepolarimComponent implements OnInit, OnDestroy {
 
           if (depo.sicaklik > ilgiliLimit.max) {
             depo.durum = 'KRİTİK';
-            depo.kritikSureSayaci += 3;
+            
+            // Sayacın eksiye düşmemesi için limit dolunca artışı durdur
+            if (depo.kritikSureSayaci < this.bildirimLimitSuresi) {
+              depo.kritikSureSayaci += 3;
+            }
 
+            // Limit dolduysa ve henüz mail gitmediyse gönder
             if (depo.kritikSureSayaci >= this.bildirimLimitSuresi && !depo.bildirimGonderildi) {
-              // ARTIK GERÇEK MAİLİ TETİKLİYORUZ
-              this.gercekMailGonder(depo); 
+              this.gercekMailGonder(depo);
             }
           } else {
+            // Sıcaklık normale dönerse her şeyi sıfırla
             depo.durum = 'NORMAL';
             depo.kritikSureSayaci = 0;
             depo.bildirimGonderildi = false;
@@ -54,21 +60,24 @@ export class DepolarimComponent implements OnInit, OnDestroy {
   }
 
   gercekMailGonder(depo: any) {
+    // Kendi mail adresini buraya tam yaz
     const mailVerisi = {
-      to: "arda.ozkan@example.com", // Burayı kendi mailinle değiştir
-      subject: `⚠️ KRİTİK UYARI: ${depo.ad}`,
-      body: `${depo.ad} deposunda sıcaklık ${depo.sicaklik}°C seviyesine ulaştı! Limit: ${depo.maxEshik}°C.`
+      to: "ozkanarda1536290@gmail.com", 
+      subject: `⚠️ KRİTİK SICAKLIK UYARISI: ${depo.ad}`,
+      body: `Dikkat! ${depo.ad} deposunda sıcaklık ${depo.sicaklik}°C seviyesine ulaştı. Belirlenen üst limit: ${depo.maxEshik}°C.`
     };
 
-    // Backend'de yazdığımız mail endpoint'ine post atıyoruz
-    this.http.post('http://localhost:8080/api/notifications/send-email', mailVerisi)
+    // KRİTİK: Port 8044 olarak güncellendi!
+    this.http.post('http://localhost:8044/api/notifications/send-email', mailVerisi)
       .subscribe({
         next: (res) => {
-          console.log("✅ Mail başarıyla gönderildi!");
-          depo.bildirimGonderildi = true; // Sadece başarılıysa yeşil yazı çıksın
+          console.log("✅ Mail backend tetiklendi!");
+          depo.bildirimGonderildi = true; 
         },
         error: (err) => {
-          console.error("❌ Mail backend'e ulaştı ama SMTP hata verdi:", err);
+          console.error("❌ Mail hatası! Backend'e ulaşılamadı veya SMTP ayarı yanlış:", err);
+          // Hata olsa bile kullanıcıyı spam'lememek için bayrağı çekebilirsin
+          // depo.bildirimGonderildi = true; 
         }
       });
   }

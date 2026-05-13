@@ -25,13 +25,24 @@ export class HaritaComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // 1. Önce boş haritayı kur
+    this.initMap();
+    
+    // 2. Sonra verileri dinle
     this.dataService.sehirVerileriniGetir().subscribe(res => {
       this.sehirDepoSayilari = res;
-      this.initMap();
+      console.log("Harita güncelleniyor, yeni sayılar:", res);
+      
+      // Eğer GeoJSON yüklendiyse, renkleri anında güncelle
+      if (this.geojsonLayer) {
+        this.geojsonLayer.setStyle((feature) => this.style(feature));
+      }
     });
   }
 
   private initMap(): void {
+    if (this.map) return; // Harita zaten kurulduysa tekrar kurma
+
     const bounds = L.latLngBounds(L.latLng(33.5, 25.0), L.latLng(43.5, 46.0));
 
     this.map = L.map(this.mapElement.nativeElement, {
@@ -47,6 +58,7 @@ export class HaritaComponent implements OnInit {
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png').addTo(this.map);
 
+    // GeoJSON'ı bir kez yüklüyoruz
     this.http.get('geojson/turkiye_iller.json').subscribe({
       next: (geoJson: any) => {
         this.geojsonLayer = L.geoJSON(geoJson, {
@@ -58,8 +70,13 @@ export class HaritaComponent implements OnInit {
     });
   }
 
+  // --- İsim Eşleştirme Mantığı ---
   private normalizeName(name: string): string {
-    return name ? name.toLocaleLowerCase('tr-TR').trim() : '';
+    return name ? name.toLocaleLowerCase('tr-TR').trim()
+      .replace(/i/g, 'i').replace(/ı/g, 'i') // i-ı karmaşasını önlemek için
+      .replace(/ğ/g, 'g').replace(/ü/g, 'u')
+      .replace(/ş/g, 's').replace(/ö/g, 'o')
+      .replace(/ç/g, 'c') : '';
   }
 
   private style(feature: any) {
@@ -74,10 +91,10 @@ export class HaritaComponent implements OnInit {
 
     return {
       fillColor: this.dataService.getColor(depoSayisi),
-      weight: 1,           // Normal durumda çok ince beyaz çizgi
+      weight: 1,
       opacity: 1,
-      color: '#ffffff',    
-      fillOpacity: 0.7     // Hafif şeffaf durması modern hissettirir
+      color: '#ffffff',
+      fillOpacity: depoSayisi > 0 ? 0.9 : 0.4 // Depo olan yerler daha belirgin
     };
   }
 
@@ -85,17 +102,7 @@ export class HaritaComponent implements OnInit {
     layer.on({
       mouseover: (e) => {
         const l = e.target;
-        
-        // --- DÜZENLEME BURASI: Siyah çizgileri ve noktaları kaldırdık ---
-        l.setStyle({
-          weight: 0,         // Sınır çizgisini tamamen kaldırdık
-          fillOpacity: 1     // Sadece dolgu rengini parlatıyoruz
-        });
-        // -------------------------------------------------------------
-
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-          l.bringToFront();
-        }
+        l.setStyle({ weight: 2, color: '#666', fillOpacity: 1 });
         
         const ad = feature.properties.name || feature.properties.NAME;
         const matchedKey = Object.keys(this.sehirDepoSayilari).find(
@@ -110,7 +117,7 @@ export class HaritaComponent implements OnInit {
         };
       },
       mouseout: (e) => {
-        this.geojsonLayer.resetStyle(e.target); // Fare ayrılınca ince beyaz çizgiye geri döner
+        this.geojsonLayer.resetStyle(e.target);
         this.seciliSehirDetay = null;
       }
     });

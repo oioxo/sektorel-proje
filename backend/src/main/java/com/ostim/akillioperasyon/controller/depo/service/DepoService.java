@@ -8,6 +8,9 @@ import com.ostim.akillioperasyon.entity.DepoEntity;
 import com.ostim.akillioperasyon.entity.IsyeriEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class DepoService {
 
@@ -19,21 +22,29 @@ public class DepoService {
         this.isyeriRepository = isyeriRepository;
     }
 
+    // --- YENİ: Frontend'in 404 almaması için tüm listeyi dönen metod ---
+    public List<DepoResponseModel> tumDepolariGetir() {
+        return depoRepository.findAll().stream()
+                .map(depo -> new DepoResponseModel(
+                        depo.getId(),
+                        depo.getDepoKodu(),
+                        depo.getDepoAciklama(),
+                        depo.getIsyeriEntity() != null ? depo.getIsyeriEntity().getId() : null
+                ))
+                .collect(Collectors.toList());
+    }
+
     public DepoResponseModel depoEkle(DepoSaveRequest request) {
-        // İsteğin içindeki isyeriId ile veritabanından o işyerini buluyoruz
         IsyeriEntity isyeri = isyeriRepository.findById(request.getIsyeriId())
                 .orElseThrow(() -> new RuntimeException("Belirtilen ID'ye sahip işyeri bulunamadı!"));
 
-        // Yeni bir Depo Entity oluşturup içini dolduruyoruz
         DepoEntity depo = new DepoEntity();
         depo.setDepoKodu(request.getDepoKodu());
         depo.setDepoAciklama(request.getDepoAciklama());
-        depo.setIsyeriEntity(isyeri); // Bulduğumuz işyerini depoya bağlıyoruz
+        depo.setIsyeriEntity(isyeri);
 
-        // Veritabanına kaydediyoruz
         DepoEntity kaydedilenDepo = depoRepository.save(depo);
 
-        // Kullanıcıya döneceğimiz response modelini hazırlıyoruz
         return new DepoResponseModel(
                 kaydedilenDepo.getId(),
                 kaydedilenDepo.getDepoKodu(),
