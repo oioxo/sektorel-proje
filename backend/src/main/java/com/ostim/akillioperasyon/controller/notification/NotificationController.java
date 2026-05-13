@@ -14,16 +14,16 @@ public class NotificationController {
     @Autowired
     private EmailService emailService;
 
-    // YAML dosyasındaki yolu tam olarak okur
+    
     @Value("${app.notification.supervisor-email}")
     private String supervisorEmail;
 
     @PostMapping("/send-email")
     public void sendEmail(@RequestBody MailRequest request) {
-        // İLK MAİL: Sana gidiyor
+        
         emailService.sendEmail(request.getTo(), request.getSubject(), request.getBody());
 
-        // İKİNCİ MAİL: Serhan Bey'e gidiyor
+        
         if (supervisorEmail != null && !supervisorEmail.isEmpty()) {
             emailService.sendEmail(supervisorEmail, "BİLGİ: " + request.getSubject(), request.getBody());
             System.out.println("✅ Çift mail tetiklendi: " + request.getTo() + " ve " + supervisorEmail);

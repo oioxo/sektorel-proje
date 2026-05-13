@@ -1,43 +1,113 @@
 <div class="admin-container">
-  <section class="admin-section">
-    <div class="section-header">
-      <h2>⚙️ Sistem Kuralları ve Limit Yönetimi</h2>
-      <p>Tüm depolar için geçerli olacak global sıcaklık kısıtlamalarını buradan güncelleyebilirsiniz.</p>
-    </div>
+  <div class="admin-layout">
 
-    <div class="rules-card">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Ürün Kategorisi</th>
-            <th>Min. Sıcaklık (°C)</th>
-            <th>Max. Sıcaklık (°C)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let urun of urunKategorileri">
-            <td class="category-name"><strong>{{ urun.ad }}</strong></td>
-            <td>
-              <div class="input-wrapper">
-                <input type="number" [(ngModel)]="urun.min" class="limit-input" placeholder="Min">
-                <span class="unit">°C</span>
-              </div>
-            </td>
-            <td>
-              <div class="input-wrapper">
-                <input type="number" [(ngModel)]="urun.max" class="limit-input" placeholder="Max">
-                <span class="unit">°C</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="left-panel">
+      <div class="panel-title">
+        <h2>Kullanıcılar</h2>
+        <p>Yönetmek istediğiniz kullanıcıyı seçin</p>
+      </div>
 
-      <div class="action-footer">
-        <button class="save-rules-btn" (click)="limitleriGuncelle()">
-          <span class="btn-icon">💾</span> Kısıtlamaları Kaydet
-        </button>
+      <div class="user-list">
+        <div *ngFor="let k of kullanicilar"
+             class="user-card"
+             [class.user-card-active]="seciliKullanici?.email === k.email"
+             (click)="kullaniciSec(k)">
+          <div class="user-avatar">{{ k.ad?.charAt(0)?.toUpperCase() || '?' }}</div>
+          <div class="user-info">
+            <span class="user-name">{{ k.ad }}</span>
+            <span class="user-email">{{ k.email }}</span>
+          </div>
+          <span class="user-badge">{{ k.depoSayisi }} depo</span>
+        </div>
+
+        <div *ngIf="kullanicilar.length === 0" class="empty-state">
+          Henüz kayıtlı kullanıcı bulunmuyor.
+        </div>
+      </div>
+
+      <div *ngIf="seciliKullanici" class="user-detail-form">
+        <h4>Kullanıcı Bilgilerini Düzenle</h4>
+        <div class="form-group">
+          <label>İsim Soyisim</label>
+          <input type="text" [(ngModel)]="kullaniciBilgiForm.kullaniciAdi" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>E-Posta</label>
+          <input type="email" [(ngModel)]="kullaniciBilgiForm.kullaniciEmail" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Telefon</label>
+          <input type="tel" [(ngModel)]="kullaniciBilgiForm.kullaniciTelefon" class="form-input">
+        </div>
+        <button class="btn-save" (click)="kullaniciBilgiGuncelle()">💾 Bilgileri Güncelle</button>
       </div>
     </div>
-  </section>
+
+    <div class="right-panel">
+
+
+      <div *ngIf="seciliKullanici">
+        <div class="panel-title">
+          <h2>{{ seciliKullanici.ad }} — Depoları</h2>
+          <p>Ayarlarını değiştirmek istediğiniz depoya tıklayın</p>
+        </div>
+
+        <div class="depot-grid">
+          <div *ngFor="let depo of kullaniciDepolar" class="depot-card" (click)="depoSecVeDuzenle(depo)">
+            <div class="depot-card-header">
+              <h3>{{ depo.ad }}</h3>
+              <span class="depot-id">ID: {{ depo.id }}</span>
+            </div>
+            <div class="depot-card-body">
+              <div class="depot-info-row">
+                <span>📍 Şehir:</span>
+                <strong>{{ depo.sehir }}</strong>
+              </div>
+              <div class="depot-info-row">
+                <span>📦 Ürün:</span>
+                <strong>{{ depo.urun }}</strong>
+              </div>
+              <div class="depot-info-row">
+                <span>🌡️ Min/Max:</span>
+                <strong>{{ depo.minSicaklik ?? '—' }}°C / {{ depo.maxSicaklik ?? '—' }}°C</strong>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="kullaniciDepolar.length === 0" class="empty-state">
+            Bu kullanıcıya ait depo bulunamadı.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="seciliDepo" class="edit-overlay" (click)="depoDuzenleKapat()">
+  <div class="edit-panel" (click)="$event.stopPropagation()">
+    <div class="edit-header">
+      <h2>{{ seciliDepo.ad }} — Ayarları Düzenle</h2>
+      <button class="close-btn" (click)="depoDuzenleKapat()">✕</button>
+    </div>
+    <div class="edit-body">
+      <div class="form-group">
+        <label>Ürün Tipi</label>
+        <select [(ngModel)]="duzenleForm.urunTipi" class="form-input">
+          <option *ngFor="let u of urunKategorileri" [value]="u.ad">{{ u.ad }}</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Min Sıcaklık (°C)</label>
+          <input type="number" [(ngModel)]="duzenleForm.minSicaklik" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Max Sıcaklık (°C)</label>
+          <input type="number" [(ngModel)]="duzenleForm.maxSicaklik" class="form-input">
+        </div>
+      </div>
+      <button class="btn-save full-width" (click)="depoAyarKaydet()">💾 Ayarları Kaydet</button>
+    </div>
+  </div>
 </div>

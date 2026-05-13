@@ -17,7 +17,7 @@ public class UrunParametreReferansResponseModel {
         this.maxDeger = maxDeger;
     }
 
-    // Getter ve Setter Metotları
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

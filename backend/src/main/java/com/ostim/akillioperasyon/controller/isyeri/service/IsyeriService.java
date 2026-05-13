@@ -42,14 +42,14 @@ public class IsyeriService {
 
     public List<IsyeriResponseModel> getAll() {
 
-//        List<IsyeriEntity> butunIsyerleri = isyeriRepository.findAll();
-//        List<IsyeriResponseModel> isyeriResponseModels = new ArrayList<>();
-//        for (IsyeriEntity isyeriEntity : butunIsyerleri) {
-//            IsyeriResponseModel isyeriResponseModel = new IsyeriResponseModel(isyeriEntity.getId(), isyeriEntity.getIsyeriAdi());
-//            isyeriResponseModels.add(isyeriResponseModel);
-//        }
-//
-//        return isyeriResponseModels;
+
+
+
+
+
+
+
+
 
 
         return isyeriRepository.findAll().stream().map(a -> new IsyeriResponseModel(a.getId(), a.getIsyeriAdi())).toList();

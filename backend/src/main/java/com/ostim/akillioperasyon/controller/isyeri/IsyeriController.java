@@ -39,5 +39,5 @@ public class IsyeriController {
         return isyeriService.getById(id);
     }
 
-    // CRUD * Create Read Update DELETE
+    
 }

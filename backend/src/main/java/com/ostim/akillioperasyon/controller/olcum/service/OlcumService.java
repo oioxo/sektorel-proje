@@ -61,7 +61,7 @@ public class OlcumService {
                 try {
                     SimpleMailMessage message = new SimpleMailMessage();
                     
-                    // BURAYA HOCANIN MAİLİNİ YAZ
+                    
                     message.setTo("serhanogurlu@gmail.com"); 
                     
                     message.setSubject("Staj Projesi: Akıllı Operasyon Sistemi - Otomatik Uyarı Testi");

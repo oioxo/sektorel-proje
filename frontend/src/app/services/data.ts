@@ -7,7 +7,7 @@ import { tap, map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class DataService {
-  private apiUrl = 'http://localhost:8044/api'; 
+  private apiUrl = 'http://localhost:8044/api';
 
   private urunLimitleri = new BehaviorSubject<any[]>([
     { id: 1, ad: 'Kırmızı Et', min: -20, max: -18 },
@@ -18,10 +18,12 @@ export class DataService {
 
   private depolar = new BehaviorSubject<any[]>([]);
   private kullaniciRolu = new BehaviorSubject<string>('admin');
-  
+  private girisYapanKullanici = new BehaviorSubject<string>('');
+
   currentRol = this.kullaniciRolu.asObservable();
   currentLimitler = this.urunLimitleri.asObservable();
   currentDepolar = this.depolar.asObservable();
+  currentKullanici = this.girisYapanKullanici.asObservable();
 
   constructor(private http: HttpClient) {
     this.depolariYukle();
@@ -38,32 +40,27 @@ export class DataService {
     return kod.charAt(0).toUpperCase() + kod.slice(1).toLowerCase();
   }
 
-  // --- GETİRME VE TRUVA ATINI AÇMA ---
   depolariYukle() {
     this.http.get<any[]>(`${this.apiUrl}/depo/all`).subscribe({
       next: (data) => {
         const formatliDepolar = data.map(backendDepo => {
-          
-          // ŞİFREYİ ÇÖZÜYORUZ: "Depo Adı||Ürün Tipi"
-          const hamAciklama = backendDepo.depoAciklama || '';
-          const parcalar = hamAciklama.split('||'); // || işaretinden ikiye böl
-          
-          const gercekAd = parcalar[0] || 'İsimsiz Depo';
-          // Eğer önceden eklenmiş eski kayıtsa (şifresizse) varsayılan Tahıl yap, yenisiyse 2. parçayı al
-          const gercekUrun = parcalar[1] || 'Tahıl'; 
-
           return {
             id: backendDepo.id,
-            ad: gercekAd,
+            ad: backendDepo.depoAdi || 'İsimsiz Depo',
             sehir: this.temizSehirIsmi(backendDepo.depoKodu || ''),
-            urun: gercekUrun,
-            sicaklik: 18.5,
+            urun: backendDepo.urunTipi || 'Belirtilmemiş',
+            sicaklik: backendDepo.sicaklik || 18.5,
+            minSicaklik: backendDepo.minSicaklik,
+            maxSicaklik: backendDepo.maxSicaklik,
+            kullaniciAdi: backendDepo.kullaniciAdi || '',
+            kullaniciEmail: backendDepo.kullaniciEmail || '',
+            kullaniciTelefon: backendDepo.kullaniciTelefon || '',
             durum: 'NORMAL',
             kritikSureSayaci: 0,
             bildirimGonderildi: false
           };
         });
-        
+
         this.depolar.next(formatliDepolar);
       },
       error: (err) => console.error("Depolar yüklenirken veritabanı hatası:", err)
@@ -85,22 +82,28 @@ export class DataService {
   }
 
   getColor(d: number) {
-    return d > 0 ? '#94a3b8' : '#f1f5f9';  
+    return d > 0 ? '#94a3b8' : '#f1f5f9';
   }
 
   limitGuncelle(yeniLimitler: any[]) {
     this.urunLimitleri.next(yeniLimitler);
   }
 
-  // --- KAYDETME VE TRUVA ATINI PAKETLEME ---
   depoEkle(yeniDepo: any) {
-    const secilenUrunAd = yeniDepo.urun || 'Tahıl';
+    const secilenUrunAd = yeniDepo.urun;
 
     const backendFormati = {
-      // ŞİFREYİ OLUŞTURUYORUZ: İsim ve Ürünü araya || koyarak birleştirip gönderiyoruz!
-      depoAciklama: `${yeniDepo.ad}||${secilenUrunAd}`,       
-      depoKodu: yeniDepo.sehir,        
-      isyeriId: 1                      
+      depoAdi: yeniDepo.ad,
+      urunTipi: secilenUrunAd,
+      sicaklik: yeniDepo.sicaklik || 18.0,
+      minSicaklik: yeniDepo.minSicaklik || null,
+      maxSicaklik: yeniDepo.maxSicaklik || null,
+      depoAciklama: '',
+      kullaniciAdi: yeniDepo.kullaniciAdi || '',
+      kullaniciEmail: yeniDepo.kullaniciEmail || '',
+      kullaniciTelefon: yeniDepo.kullaniciTelefon || '',
+      depoKodu: yeniDepo.sehir,
+      isyeriId: 1
     };
 
     return this.http.post(`${this.apiUrl}/depo/save`, backendFormati).pipe(
@@ -108,7 +111,36 @@ export class DataService {
     );
   }
 
+  depoGuncelle(id: number, guncelVeri: any) {
+    return this.http.put(`${this.apiUrl}/depo/update/${id}`, guncelVeri).pipe(
+      tap(() => this.depolariYukle())
+    );
+  }
+
+  depoSil(id: number) {
+    return this.http.delete(`${this.apiUrl}/depo/delete/${id}`).pipe(
+      tap(() => this.depolariYukle())
+    );
+  }
+
   rolGuncelle(yeniRol: string) {
     this.kullaniciRolu.next(yeniRol);
+  }
+
+  kullaniciGuncelle(kullaniciAdi: string) {
+    this.girisYapanKullanici.next(kullaniciAdi);
+  }
+
+  cikisYap() {
+    this.kullaniciRolu.next('admin');
+    this.girisYapanKullanici.next('');
+  }
+
+  getGirisYapanKullanici(): string {
+    return this.girisYapanKullanici.getValue();
+  }
+
+  getRol(): string {
+    return this.kullaniciRolu.getValue();
   }
 }

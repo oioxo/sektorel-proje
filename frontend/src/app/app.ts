@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router'; // Router ekledik
+import { Router, RouterOutlet } from '@angular/router'; 
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './components/sidebar/sidebar';
 
@@ -11,6 +11,6 @@ import { SidebarComponent } from './components/sidebar/sidebar';
   styleUrl: './app.css'
 })
 export class AppComponent {
-  // 'public' olması şart, yoksa HTML'deki *ngIf router'ı bulamaz!
+  
   constructor(public router: Router) {} 
 }

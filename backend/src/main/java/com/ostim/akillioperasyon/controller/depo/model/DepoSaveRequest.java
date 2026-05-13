@@ -11,6 +11,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DepoSaveRequest {
     private String depoKodu;
+    private String depoAdi;
+    private String urunTipi;
+    private Double sicaklik;
+    private Double minSicaklik;
+    private Double maxSicaklik;
     private String depoAciklama;
-    private Long isyeriId; // Deponun bağlı olduğu işyerinin ID'sini alacağız
+    private String kullaniciAdi;
+    private String kullaniciEmail;
+    private String kullaniciTelefon;
+    private Long isyeriId;
 }

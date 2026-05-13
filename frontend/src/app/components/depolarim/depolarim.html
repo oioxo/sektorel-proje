@@ -7,22 +7,29 @@
   </div>
 
   <div class="depo-grid">
-    <div *ngFor="let depo of depoListesi" class="depo-card" [class.danger-border]="depo.durum === 'KRİTİK'">
-      
+    <div *ngFor="let depo of depoListesi" class="depo-card clickable-card" [class.danger-border]="depo.durum === 'KRİTİK'" (click)="depoDetayAc(depo)">
+
       <div class="card-header">
         <div class="status-indicator">
           <span class="status-dot" [class.dot-red]="depo.durum === 'KRİTİK'"></span>
           <h3>{{ depo.ad }}</h3>
         </div>
-        <span class="badge">ID: {{ depo.id }}</span>
+        <div class="card-actions">
+          <button *ngIf="rol === 'admin'" class="card-delete-btn" (click)="depoSilOnay(depo, $event)" title="Depoyu Sil">🗑️</button>
+          <span class="badge">ID: {{ depo.id }}</span>
+        </div>
       </div>
-      
+
       <div class="card-body">
+        <div class="info-row">
+          <span class="label">Şehir:</span>
+          <span class="value">{{ depo.sehir }}</span>
+        </div>
         <div class="info-row">
           <span class="label">Saklanan Ürün:</span>
           <span class="value">{{ depo.urun }}</span>
         </div>
-        
+
         <div class="temp-box">
           <div class="temp-value" [class.text-red]="depo.durum === 'KRİTİK'">
             {{ depo.sicaklik }}°C
@@ -47,6 +54,67 @@
       <div *ngIf="depo.durum === 'KRİTİK'" class="alert-footer">
         ⚠️ YÜKSEK SICAKLIK UYARISI!
       </div>
+    </div>
+  </div>
+
+  <div *ngIf="depoListesi.length === 0" class="empty-state">
+    <p>{{ rol === 'admin' ? 'Henüz kayıtlı depo bulunmuyor.' : 'Size ait depo bulunamadı. Lütfen kayıt adınızı kontrol edin.' }}</p>
+  </div>
+</div>
+
+<div *ngIf="seciliDepo" class="detail-overlay" (click)="depoDetayKapat()">
+  <div class="detail-panel" (click)="$event.stopPropagation()">
+    <div class="detail-header">
+      <h2>{{ seciliDepo.ad }}</h2>
+      <button class="close-btn" (click)="depoDetayKapat()">✕</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-section">
+        <h4>Depo Bilgileri</h4>
+        <div class="detail-row">
+          <span class="detail-label">Şehir:</span>
+          <span class="detail-value">{{ seciliDepo.sehir }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Ürün Tipi:</span>
+          <span class="detail-value">{{ seciliDepo.urun }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Anlık Sıcaklık:</span>
+          <span class="detail-value" [class.text-red]="seciliDepo.durum === 'KRİTİK'">{{ seciliDepo.sicaklik }}°C</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Durum:</span>
+          <span class="detail-value" [style.color]="seciliDepo.durum === 'KRİTİK' ? '#ef4444' : '#22c55e'">{{ seciliDepo.durum }}</span>
+        </div>
+      </div>
+      <div class="detail-section">
+        <h4>Kullanıcı Bilgileri</h4>
+        <div class="detail-row">
+          <span class="detail-label">👤 İsim:</span>
+          <span class="detail-value">{{ seciliDepo.kullaniciAdi || 'Belirtilmemiş' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">📧 E-Posta:</span>
+          <span class="detail-value">{{ seciliDepo.kullaniciEmail || 'Belirtilmemiş' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">📱 Telefon:</span>
+          <span class="detail-value">{{ seciliDepo.kullaniciTelefon || 'Belirtilmemiş' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="silmeOnay" class="detail-overlay" (click)="depoSilIptal()">
+  <div class="delete-confirm-panel" (click)="$event.stopPropagation()">
+    <div class="delete-icon">⚠️</div>
+    <h3>Depo Silme Onayı</h3>
+    <p>"<strong>{{ silmeOnay.ad }}</strong>" deposu kalıcı olarak silinecek.</p>
+    <div class="delete-actions">
+      <button class="btn-cancel" (click)="depoSilIptal()">İptal</button>
+      <button class="btn-confirm-delete" (click)="depoSilOnayla()">Evet, Sil</button>
     </div>
   </div>
 </div>

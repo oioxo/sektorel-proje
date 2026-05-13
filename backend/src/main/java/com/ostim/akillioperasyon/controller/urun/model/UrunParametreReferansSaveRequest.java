@@ -6,7 +6,7 @@ public class UrunParametreReferansSaveRequest {
     private Double minDeger;
     private Double maxDeger;
 
-    // Getter ve Setter Metotları
+    
     public Long getUrunId() { return urunId; }
     public void setUrunId(Long urunId) { this.urunId = urunId; }
 

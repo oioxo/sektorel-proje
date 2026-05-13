@@ -13,12 +13,15 @@ import { DataService } from '../../services/data';
 export class OlcumPanelComponent {
   mesaj: string = "";
   
-  // Form verileri
+  
   yeniDepo: any = {
     ad: '',
     sehir: '',
     urunId: '',
-    adres: ''
+    adres: '',
+    kullaniciAdi: '',
+    kullaniciEmail: '',
+    kullaniciTelefon: ''
   };
 
   sehirler: string[] = [
@@ -35,37 +38,40 @@ export class OlcumPanelComponent {
   constructor(private dataService: DataService) {}
 
   kurulumTalebiOlustur() {
-    // 1. Validasyon Kontrolü
-    if (!this.yeniDepo.ad || !this.yeniDepo.sehir || !this.yeniDepo.urunId || !this.yeniDepo.adres) {
+    
+    if (!this.yeniDepo.ad || !this.yeniDepo.sehir || !this.yeniDepo.urunId || !this.yeniDepo.adres || !this.yeniDepo.kullaniciAdi || !this.yeniDepo.kullaniciEmail || !this.yeniDepo.kullaniciTelefon) {
       this.mesaj = "⚠️ DİKKAT: Lütfen tüm alanları eksiksiz doldurunuz!";
       return;
     }
 
     const secilenUrun = this.urunler.find(u => u.id === Number(this.yeniDepo.urunId));
 
-    // Backend'in beklediği ham veri (çeviri data.ts içinde yapılacak)
+    
     const kaydedilecekVeri = {
       ad: this.yeniDepo.ad,
       sehir: this.yeniDepo.sehir,
       urun: secilenUrun?.ad,
       urunId: Number(this.yeniDepo.urunId),
-      sicaklik: 18.5, // Varsayılan başlangıç sıcaklığı
+      sicaklik: 18.5,
       durum: 'NORMAL',
-      adres: this.yeniDepo.adres
+      adres: this.yeniDepo.adres,
+      kullaniciAdi: this.yeniDepo.kullaniciAdi,
+      kullaniciEmail: this.yeniDepo.kullaniciEmail,
+      kullaniciTelefon: this.yeniDepo.kullaniciTelefon
     };
 
-    // 2. KRİTİK NOKTA: .subscribe() ekleyerek isteği gerçekten gönderiyoruz
+    
     this.dataService.depoEkle(kaydedilecekVeri).subscribe({
       next: (res) => {
-        // Kayıt başarılıysa mesajı göster ve formu temizle
+        
         this.mesaj = `🚀 Tebrikler Arda! "${this.yeniDepo.ad}" kaydı başarıyla alındı. Haritayı kontrol edebilirsin.`;
         console.log("Veritabanına kayıt başarıyla işlendi:", res);
         
-        // Formu temizle
-        this.yeniDepo = { ad: '', sehir: '', urunId: '', adres: '' };
+        
+        this.yeniDepo = { ad: '', sehir: '', urunId: '', adres: '', kullaniciAdi: '', kullaniciEmail: '', kullaniciTelefon: '' };
       },
       error: (err) => {
-        // Hata durumunda logla
+        
         console.error("Depo eklenirken hata oluştu:", err);
         this.mesaj = "❌ Hata: Kayıt PostgreSQL'e iletilemedi. Backend bağlantısını kontrol et!";
       }

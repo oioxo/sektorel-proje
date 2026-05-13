@@ -27,37 +27,37 @@ public class UrunService {
         this.parametreRepository = parametreRepository;
     }
 
-    // Sisteme yeni bir ürün kaydetmek için kullanıyoruz
+    
     public UrunEntity urunEkle(UrunEntity urun) {
         return urunRepository.save(urun);
     }
 
-    // Veritabanındaki tüm ürünleri listelemek için kullanıyoruz
+    
     public List<UrunEntity> tumUrunleriGetir() {
         return urunRepository.findAll();
     }
 
-    // YENİ: Ürün ve Parametre eşleştirmesi (Referans Aralıkları Belirleme)
+    
     public UrunParametreReferansResponseModel referansEkle(UrunParametreReferansSaveRequest request) {
-        // 1. Ürünü bul
+        
         UrunEntity urun = urunRepository.findById(request.getUrunId())
                 .orElseThrow(() -> new RuntimeException("Belirtilen ID'ye sahip ürün bulunamadı!"));
 
-        // 2. Parametreyi bul
+        
         ParametreEntity parametre = parametreRepository.findById(request.getParametreId())
                 .orElseThrow(() -> new RuntimeException("Belirtilen ID'ye sahip parametre bulunamadı!"));
 
-        // 3. Referans nesnesini oluştur ve doldur
+        
         UrunParametreReferansEntity referans = new UrunParametreReferansEntity();
         referans.setUrun(urun); 
         referans.setParametre(parametre);
         referans.setMinDeger(request.getMinDeger());
         referans.setMaxDeger(request.getMaxDeger());
 
-        // 4. Veritabanına kaydet
+        
         UrunParametreReferansEntity kaydedilen = referansRepository.save(referans);
 
-        // 5. Kullanıcıya sonucu dön
+        
         return new UrunParametreReferansResponseModel(
                 kaydedilen.getId(),
                 kaydedilen.getUrun().getAd(),
@@ -67,7 +67,7 @@ public class UrunService {
         );
     }
 
-    // Sensörden gelen değeri, ürünün referans aralığı ile karşılaştırıyoruz
+    
     public void olcumDegerlendir(String urunAd, String parametreAd, double olculenDeger, double minDeger, double maxDeger) {
         if (olculenDeger < minDeger || olculenDeger > maxDeger) {
             uyariMailiGonder(urunAd, parametreAd, olculenDeger);

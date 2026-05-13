@@ -27,7 +27,7 @@ public class KullaniciService {
         KullaniciEntity kullaniciEntity = new KullaniciEntity();
 
         kullaniciEntity.setUsername(kullaniciSaveRequest.username());
-        /*password encode şifre veritabanına hashlenerek kaydedilir. araştırma ödevi*/
+        
         kullaniciEntity.setPassword(kullaniciSaveRequest.password());
         kullaniciEntity.setEmail(kullaniciSaveRequest.email());
         kullaniciEntity.setPhoneNumber(kullaniciSaveRequest.phoneNumber());

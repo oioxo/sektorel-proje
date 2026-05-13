@@ -6,7 +6,7 @@ import { HaritaComponent } from './components/harita/harita';
 import { DepolarimComponent } from './components/depolarim/depolarim';
 
 export const routes: Routes = [
-  // Burayı 'login' olarak güncelledik:
+  
   { path: '', redirectTo: 'login', pathMatch: 'full' }, 
   { path: 'login', component: LoginComponent },
   { path: 'depolarim', component: DepolarimComponent },

@@ -13,8 +13,13 @@ import { DataService } from '../../services/data';
 export class DepolarimComponent implements OnInit, OnDestroy {
   interval: any;
   depoListesi: any[] = [];
+  tumDepolar: any[] = [];
   limitler: any[] = [];
-  bildirimLimitSuresi = 10; // Saniye
+  bildirimLimitSuresi = 10;
+  seciliDepo: any = null;
+  silmeOnay: any = null;
+  rol: string = 'admin';
+  kullaniciAdi: string = '';
 
   constructor(
     private dataService: DataService,
@@ -22,39 +27,37 @@ export class DepolarimComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.rol = this.dataService.getRol();
+    this.kullaniciAdi = this.dataService.getGirisYapanKullanici();
+
     this.dataService.currentLimitler.subscribe(res => this.limitler = res);
     this.dataService.currentDepolar.subscribe(res => {
-      this.depoListesi = res;
-      // Ekrana gelir gelmez eşik değerlerini dolduruyoruz (Boş görünmesini engeller)
+      this.tumDepolar = res;
+      this.filtreUygula();
       this.esikleriDoldur();
     });
 
     this.interval = setInterval(() => {
       this.depoListesi.forEach(depo => {
-        // Sıcaklık Simülasyonu
         const degisim = (Math.random() - 0.5);
         depo.sicaklik = parseFloat((depo.sicaklik + degisim).toFixed(1));
 
-        // KRİTİK DEĞİŞİKLİK: Artık urunId yerine direkt Ürün ADINA (depo.urun) göre arıyoruz!
-        const ilgiliLimit = this.limitler.find(l => l.ad === depo.urun);
-        
-        if (ilgiliLimit) {
-          depo.maxEshik = ilgiliLimit.max;
+        const maxLimit = depo.maxSicaklik ?? this.limitler.find(l => l.ad === depo.urun)?.max;
 
-          if (depo.sicaklik > ilgiliLimit.max) {
+        if (maxLimit != null) {
+          depo.maxEshik = maxLimit;
+
+          if (depo.sicaklik > maxLimit) {
             depo.durum = 'KRİTİK';
-            
-            // Sayacın eksiye düşmemesi için limit dolunca artışı durdur
+
             if (depo.kritikSureSayaci < this.bildirimLimitSuresi) {
               depo.kritikSureSayaci += 3;
             }
 
-            // Limit dolduysa ve henüz mail gitmediyse gönder
             if (depo.kritikSureSayaci >= this.bildirimLimitSuresi && !depo.bildirimGonderildi) {
               this.gercekMailGonder(depo);
             }
           } else {
-            // Sıcaklık normale dönerse her şeyi sıfırla
             depo.durum = 'NORMAL';
             depo.kritikSureSayaci = 0;
             depo.bildirimGonderildi = false;
@@ -64,33 +67,83 @@ export class DepolarimComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  // İlk açılışta kartların boş kalmaması için yardımcı fonksiyon
+  filtreUygula() {
+    if (this.rol === 'admin') {
+      this.depoListesi = this.tumDepolar;
+    } else {
+      this.depoListesi = this.tumDepolar.filter(
+        d => d.kullaniciAdi.toLowerCase() === this.kullaniciAdi.toLowerCase()
+      );
+    }
+  }
+
   esikleriDoldur() {
     this.depoListesi.forEach(depo => {
-      const ilgiliLimit = this.limitler.find(l => l.ad === depo.urun);
-      if (ilgiliLimit) {
-        depo.maxEshik = ilgiliLimit.max;
+      const maxLimit = depo.maxSicaklik ?? this.limitler.find(l => l.ad === depo.urun)?.max;
+      if (maxLimit != null) {
+        depo.maxEshik = maxLimit;
       }
     });
   }
 
   gercekMailGonder(depo: any) {
+    const kullaniciMail = depo.kullaniciEmail;
+    if (!kullaniciMail) {
+      depo.bildirimGonderildi = true;
+      return;
+    }
+
     const mailVerisi = {
-      to: "ozkanarda1536290@gmail.com", 
+      to: kullaniciMail,
       subject: `⚠️ KRİTİK SICAKLIK UYARISI: ${depo.ad}`,
       body: `Dikkat! ${depo.ad} deposunda sıcaklık ${depo.sicaklik}°C seviyesine ulaştı. Belirlenen üst limit: ${depo.maxEshik}°C.`
     };
 
     this.http.post('http://localhost:8044/api/notifications/send-email', mailVerisi)
       .subscribe({
-        next: (res) => {
-          console.log("✅ Mail backend tetiklendi!");
-          depo.bildirimGonderildi = true; 
+        next: () => {
+          console.log(`✅ Mail gönderildi: ${kullaniciMail}`);
+          depo.bildirimGonderildi = true;
         },
         error: (err) => {
-          console.error("❌ Mail hatası! Backend'e ulaşılamadı veya SMTP ayarı yanlış:", err);
+          console.error("❌ Mail hatası:", err);
         }
       });
+  }
+
+  depoDetayAc(depo: any) {
+    this.seciliDepo = depo;
+  }
+
+  depoDetayKapat() {
+    this.seciliDepo = null;
+  }
+
+  depoSilOnay(depo: any, event: Event) {
+    event.stopPropagation();
+    this.silmeOnay = depo;
+  }
+
+  depoSilIptal() {
+    this.silmeOnay = null;
+  }
+
+  depoSilOnayla() {
+    if (!this.silmeOnay) return;
+    const silinecekId = this.silmeOnay.id;
+    const silinecekAd = this.silmeOnay.ad;
+
+    this.dataService.depoSil(silinecekId).subscribe({
+      next: () => {
+        alert(`🗑️ "${silinecekAd}" deposu silindi!`);
+        this.silmeOnay = null;
+        this.seciliDepo = null;
+      },
+      error: () => {
+        alert('❌ Depo silinemedi!');
+        this.silmeOnay = null;
+      }
+    });
   }
 
   ngOnDestroy() {

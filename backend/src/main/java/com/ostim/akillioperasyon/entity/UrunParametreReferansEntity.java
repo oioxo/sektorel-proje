@@ -24,7 +24,7 @@ public class UrunParametreReferansEntity {
     @Column(name = "max_deger", nullable = false)
     private Double maxDeger;
 
-    // Getter ve Setter metotları
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

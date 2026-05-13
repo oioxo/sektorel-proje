@@ -1,9 +1,17 @@
 <div class="map-container">
   <div class="map-header">
-    <h1 class="page-title">Coğrafi Depo Dağılımı</h1>
-    <p>Operasyonel ağımızın Türkiye genelindeki coğrafi yoğunluğunu takip edin.</p>
+    <div class="header-left">
+      <h1 class="page-title">Coğrafi Depo Dağılımı</h1>
+      <p>Operasyonel ağımızın Türkiye genelindeki coğrafi yoğunluğunu takip edin.</p>
+    </div>
+    <div class="filter-bar" *ngIf="rol === 'admin'">
+      <select class="filter-select" [(ngModel)]="seciliFiltre" (change)="filtreSecildi()">
+        <option value="genel">🌍 Genel Dağılım</option>
+        <option *ngFor="let k of kullanicilar" [value]="k.email">👤 {{ k.ad }}</option>
+      </select>
+    </div>
   </div>
-  
+
   <div class="map-wrapper">
     <div #mapElement class="tr-map-leaflet"></div>
 
@@ -21,10 +29,49 @@
     </div>
   </div>
 
+  <div class="depot-list-section" *ngIf="filtrelenmisDepolar.length > 0">
+    <h3 class="list-title">
+      {{ seciliFiltre === 'genel' ? 'Tüm Depolar' : 'Kullanıcıya Ait Depolar' }}
+      <span class="list-count">{{ filtrelenmisDepolar.length }} depo</span>
+    </h3>
+    <div class="depot-list-grid">
+      <div *ngFor="let depo of filtrelenmisDepolar" class="depot-list-card">
+        <div class="dlc-header">
+          <h4>{{ depo.ad }}</h4>
+          <span class="dlc-id">ID: {{ depo.id }}</span>
+        </div>
+        <div class="dlc-body">
+          <div class="dlc-row">
+            <span>📍 {{ depo.sehir }}</span>
+            <span>📦 {{ depo.urun }}</span>
+          </div>
+          <div class="dlc-row" *ngIf="depo.kullaniciAdi">
+            <span>👤 {{ depo.kullaniciAdi }}</span>
+          </div>
+        </div>
+        <div class="dlc-footer" *ngIf="rol === 'admin'">
+          <button class="delete-btn" (click)="depoSilOnay(depo)">🗑️ Sil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="map-legend">
     <div class="legend-item"><span class="dot red"></span> Kritik (>50)</div>
     <div class="legend-item"><span class="dot orange"></span> Yüksek (>20)</div>
     <div class="legend-item"><span class="dot yellow"></span> Orta (>10)</div>
     <div class="legend-item"><span class="dot gray"></span> Düşük</div>
+  </div>
+</div>
+
+<div *ngIf="silmeOnay" class="delete-overlay" (click)="depoSilIptal()">
+  <div class="delete-panel" (click)="$event.stopPropagation()">
+    <div class="delete-icon">⚠️</div>
+    <h3>Depo Silme Onayı</h3>
+    <p>"<strong>{{ silmeOnay.ad }}</strong>" deposu kalıcı olarak silinecek. Bu işlem geri alınamaz.</p>
+    <div class="delete-actions">
+      <button class="btn-cancel" (click)="depoSilIptal()">İptal</button>
+      <button class="btn-confirm-delete" (click)="depoSilOnayla()">Evet, Sil</button>
+    </div>
   </div>
 </div>

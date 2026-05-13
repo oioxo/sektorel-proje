@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OlcumPanel } from './olcum-panel';
+import { OlcumPanelComponent } from './olcum-panel';
 
-describe('OlcumPanel', () => {
-  let component: OlcumPanel;
-  let fixture: ComponentFixture<OlcumPanel>;
+describe('OlcumPanelComponent', () => {
+  let component: OlcumPanelComponent;
+  let fixture: ComponentFixture<OlcumPanelComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OlcumPanel],
+      imports: [OlcumPanelComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(OlcumPanel);
+    fixture = TestBed.createComponent(OlcumPanelComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

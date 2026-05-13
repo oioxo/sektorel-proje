@@ -2,21 +2,31 @@
   <div class="login-card">
     <div class="login-header">
       <h2>DEPO<span>CONTROL</span></h2>
-      <p>Sisteme erişmek için kimlik bilgilerinizi doğrulayın.</p>
+      <p>Sisteme erişmek için giriş yönteminizi seçin.</p>
     </div>
 
-    <form class="login-form">
-      <div class="input-group">
-        <label>Kullanıcı Adı</label>
-        <input type="text" placeholder="Kullanıcı adınızı girin">
-      </div>
-      <div class="input-group">
-        <label>Şifre</label>
-        <input type="password" placeholder="••••••••">
+    <div class="login-sections">
+      <div class="login-section admin-section">
+        <div class="section-label">Yönetici</div>
+        <p class="section-desc">Tüm depo ve kullanıcı yönetimine tam erişim</p>
+        <button type="button" class="login-btn" (click)="yoneticiGiris()">🔐 Yönetici Olarak Gir</button>
       </div>
 
-      <button type="button" class="login-btn" (click)="girisYap('admin')">Yönetici Girişi</button>
-      <button type="button" class="user-btn" (click)="girisYap('user')">Operatör Girişi</button>
-    </form>
+      <div class="section-divider">
+        <span>veya</span>
+      </div>
+
+      <div class="login-section operator-section">
+        <div class="section-label">Operatör</div>
+        <p class="section-desc">Kendi depolarınızı görüntüleyin ve takip edin</p>
+        <div class="input-group">
+          <label>Adınızı Girin</label>
+          <input type="text" [(ngModel)]="operatorAdi" placeholder="Örn: Ahmet Yılmaz" class="name-input"
+                 (keyup.enter)="operatorGiris()">
+        </div>
+        <div *ngIf="hata" class="error-msg">{{ hata }}</div>
+        <button type="button" class="user-btn" (click)="operatorGiris()">👤 Operatör Olarak Gir</button>
+      </div>
+    </div>
   </div>
 </div>

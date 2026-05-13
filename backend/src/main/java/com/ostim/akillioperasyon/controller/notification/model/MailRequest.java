@@ -2,7 +2,7 @@ package com.ostim.akillioperasyon.controller.notification.model;
 
 import lombok.Data;
 
-@Data // Getter ve Setter'ları otomatik oluşturur
+@Data 
 public class MailRequest {
     private String to;
     private String subject;

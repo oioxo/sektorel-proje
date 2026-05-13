@@ -5,7 +5,7 @@ import com.ostim.akillioperasyon.controller.olcum.model.OlcumSaveRequest;
 import com.ostim.akillioperasyon.controller.olcum.service.OlcumService;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:4200") // Angular'dan gelen isteklere izin veren ayar
+@CrossOrigin(origins = "http://localhost:4200") 
 @RestController
 @RequestMapping("/olcum")
 public class OlcumController {

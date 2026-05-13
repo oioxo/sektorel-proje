@@ -28,7 +28,7 @@ public class UrunController {
         return urunService.tumUrunleriGetir();
     }
 
-    // YENİ EKLENEN UÇ NOKTA: Referans Ekleme
+    
     @PostMapping("/referans-ekle")
     public UrunParametreReferansResponseModel referansEkle(@RequestBody UrunParametreReferansSaveRequest request) {
         return urunService.referansEkle(request);

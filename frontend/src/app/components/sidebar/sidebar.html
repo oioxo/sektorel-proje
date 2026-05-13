@@ -2,7 +2,7 @@
   <div class="logo">
     <h3>DEPO<span>CONTROL</span></h3>
   </div>
-  
+
   <nav>
     <a routerLink="/depolarim" routerLinkActive="active">
       <i class="icon">📡</i> Canlı İzleme
@@ -19,12 +19,17 @@
     <div *ngIf="rol === 'admin'" class="nav-divider"></div>
 
     <a *ngIf="rol === 'admin'" routerLink="/admin" routerLinkActive="active">
-      <i class="icon">⚙️</i> Sistem Ayarları
+      <i class="icon">⚙️</i> Yönetim Paneli
     </a>
   </nav>
 
-  <div class="user-info">
-    <div class="user-dot"></div>
-    <p>{{ rol === 'admin' ? 'Yönetici' : 'Operatör' }}: <strong>Arda</strong></p>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-dot"></div>
+      <p>{{ rol === 'admin' ? 'Yönetici' : 'Operatör' }}: <strong>{{ rol === 'admin' ? 'Admin' : kullaniciAdi }}</strong></p>
+    </div>
+    <button class="logout-btn" (click)="cikisYap()">
+      <i class="icon">🚪</i> Çıkış Yap
+    </button>
   </div>
 </div>

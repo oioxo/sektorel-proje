@@ -69,9 +69,12 @@ nav a.active {
   margin: 15px 0;
 }
 
+.sidebar-footer {
+  border-top: 1px solid #1e293b;
+}
+
 .user-info {
-  padding: 20px;
-  background-color: #020617;
+  padding: 16px 20px;
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -93,4 +96,22 @@ nav a.active {
 
 .user-info strong {
   color: #f8fafc;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 14px 25px;
+  background: #020617;
+  color: #94a3b8;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: #1e293b;
+  color: #ef4444;
 }

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Depolarim } from './depolarim';
+import { DepolarimComponent } from './depolarim';
 
-describe('Depolarim', () => {
-  let component: Depolarim;
-  let fixture: ComponentFixture<Depolarim>;
+describe('DepolarimComponent', () => {
+  let component: DepolarimComponent;
+  let fixture: ComponentFixture<DepolarimComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Depolarim],
+      imports: [DepolarimComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Depolarim);
+    fixture = TestBed.createComponent(DepolarimComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -13,16 +13,16 @@ spring:
       max-request-size: 10MB
 
   datasource:
-    url: jdbc:postgresql://************************** 
+    url: jdbc:postgresql://localhost:5432/akilli_operasyon_db
     username: postgres
-    password: ***** 
+    password: 1234 
     driver-class-name: org.postgresql.Driver
     
   mail:
     host: smtp.gmail.com
     port: 587
     username: ozkanarda1536290@gmail.com
-    password: ************* # Buraya Gmail uygulama şifreni yaz
+    password: lsekvwkiuadzarcb
     properties:
       mail:
         smtp:
@@ -30,7 +30,7 @@ spring:
           starttls:
             enable: true
 
-# ARTIK EN SOLDA VE DOĞRU HİZADA
+
 app:
   notification:
     supervisor-email: "serhanogurlu@gmail.com"

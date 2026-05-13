@@ -29,6 +29,21 @@
         </select>
       </div>
 
+      <div class="input-group">
+        <label>İsim Soyisim</label>
+        <input type="text" [(ngModel)]="yeniDepo.kullaniciAdi" placeholder="Örn: Ahmet Yılmaz" class="modern-input">
+      </div>
+
+      <div class="input-group">
+        <label>E-Posta Adresi</label>
+        <input type="email" [(ngModel)]="yeniDepo.kullaniciEmail" placeholder="Örn: ahmet@firma.com" class="modern-input">
+      </div>
+
+      <div class="input-group" style="grid-column: 1 / -1;">
+        <label>Telefon Numarası</label>
+        <input type="tel" [(ngModel)]="yeniDepo.kullaniciTelefon" placeholder="Örn: 0532 123 45 67" class="modern-input">
+      </div>
+
       <div class="input-group" style="grid-column: 1 / -1;">
         <label>Kurulum Yapılacak Açık Adres</label>
         <textarea [(ngModel)]="yeniDepo.adres" rows="3" placeholder="Mahalle, Sokak, No..." class="modern-input" style="resize: none;"></textarea>

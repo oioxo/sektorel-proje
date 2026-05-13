@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { DataService } from '../../services/data';
 
 @Component({
@@ -11,15 +11,22 @@ import { DataService } from '../../services/data';
   styleUrl: './sidebar.css'
 })
 export class SidebarComponent implements OnInit {
-  rol: string = 'operator'; // Başlangıç değeri
+  rol: string = 'operator';
+  kullaniciAdi: string = '';
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, private router: Router) {}
 
   ngOnInit() {
-    // DataService'teki rolü canlı izle (Abone ol)
     this.dataService.currentRol.subscribe(yeniRol => {
       this.rol = yeniRol;
-      console.log("Güncel Kullanıcı Rolü:", this.rol);
     });
+    this.dataService.currentKullanici.subscribe(ad => {
+      this.kullaniciAdi = ad;
+    });
+  }
+
+  cikisYap() {
+    this.dataService.cikisYap();
+    this.router.navigate(['/login']);
   }
 }

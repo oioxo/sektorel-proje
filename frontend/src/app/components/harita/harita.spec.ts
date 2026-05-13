@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Harita } from './harita';
+import { HaritaComponent } from './harita';
 
-describe('Harita', () => {
-  let component: Harita;
-  let fixture: ComponentFixture<Harita>;
+describe('HaritaComponent', () => {
+  let component: HaritaComponent;
+  let fixture: ComponentFixture<HaritaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Harita],
+      imports: [HaritaComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Harita);
+    fixture = TestBed.createComponent(HaritaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
