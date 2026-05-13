@@ -10,20 +10,20 @@
     <div class="form-grid">
       <div class="input-group">
         <label>Depo Adı / Tanımı</label>
-        <input type="text" #depoAd placeholder="Örn: Batı Lojistik Merkezi" class="modern-input">
+        <input type="text" [(ngModel)]="yeniDepo.ad" placeholder="Örn: Batı Lojistik Merkezi" class="modern-input">
       </div>
 
       <div class="input-group">
         <label>Bulunduğu Şehir</label>
-        <select #sehir class="modern-input">
-          <option value="">Şehir Seçiniz...</option>
+        <select class="modern-input" [(ngModel)]="yeniDepo.sehir">
+          <option value="" disabled selected>Şehir Seçiniz...</option>
           <option *ngFor="let s of sehirler" [value]="s">{{ s }}</option>
         </select>
       </div>
 
       <div class="input-group" style="grid-column: 1 / -1;">
         <label>Saklanacak Ürün Tipi</label>
-        <select #urunId class="modern-input">
+        <select class="modern-input" [(ngModel)]="yeniDepo.urunId">
           <option value="">Ürün Tipini Seçiniz...</option>
           <option *ngFor="let urun of urunler" [value]="urun.id">{{ urun.ad }}</option>
         </select>
@@ -31,11 +31,11 @@
 
       <div class="input-group" style="grid-column: 1 / -1;">
         <label>Kurulum Yapılacak Açık Adres</label>
-        <textarea #adres rows="3" placeholder="Mahalle, Sokak, No ve varsa depo kapı numarasını belirtiniz..." class="modern-input" style="resize: none;"></textarea>
+        <textarea [(ngModel)]="yeniDepo.adres" rows="3" placeholder="Mahalle, Sokak, No..." class="modern-input" style="resize: none;"></textarea>
       </div>
     </div>
 
-    <button class="submit-btn" (click)="kurulumTalebiOlustur(depoAd.value, sehir.value, urunId.value, adres.value)">
+    <button class="submit-btn" (click)="kurulumTalebiOlustur()">
       DEPOYU KAYDET VE KURULUM TALEBİ OLUŞTUR
     </button>
 
